@@ -1,0 +1,108 @@
+﻿@model gerenciadorConsultasPICS.Areas.Usuario.ViewModels.Agendamento.Etapa2ViewModel
+@{
+    ViewData["Title"] = "Novo Agendamento - Etapa 2";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+
+    <form id="formEtapa2" asp-action="NovoAgendamentoEtapa2" method="post">
+        <div class="form-group">
+            <h1 asp-for="idInstituicao">Selecione a instituição que deseja receber o atendimento</h1>
+
+            <select id="idInstituicao" name="idInstituicao" required class="form-select">
+                <option value="">Selecione uma instituição</option>
+                @foreach (var instituicao in ViewBag.Instituicoes)
+                {
+                    if (instituicao.idInstituicao == Model.idInstituicao)
+                    {
+                        <option value="@instituicao.idInstituicao" selected>@instituicao.nome</option>
+                    }
+                    else
+                    {
+                        <option value="@instituicao.idInstituicao">@instituicao.nome</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <h1 asp-for="idPratica">Selecione a prática desejada para os atendimentos</h1>
+            <select id="idPratica" name="idPratica" required class="form-select">
+                <option value="">Selecione uma prática</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn">Continuar</button>
+    </form>
+
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        function obterPraticas(idInstituicao) {
+            $.ajax({
+                url: '/Admin/Pratica/ObterPraticasPorInstituicao',
+                type: 'GET',
+                data: { idInstituicao: idInstituicao },
+                success: function (resposta) {
+                    if (resposta.sucesso) {
+                        $('#idPratica').empty();
+                        $('#idPratica').append('<option value="">Selecione uma prática</option>');
+
+                        $.each(resposta.listaPraticas, function (index, pratica) {
+                            if ('@Model.idPratica' == pratica.idPratica) {
+                                $('#idPratica').append('<option value="' + pratica.idPratica + '" selected>' + pratica.nome + '</option>');
+                            } else {
+                                $('#idPratica').append('<option value="' + pratica.idPratica + '">' + pratica.nome + '</option>');
+                            }
+                        });
+                    } else {
+                        exibirAlerta(resposta.mensagem);
+                    }
+                },
+                error: function () {
+                    exibirAlerta('Erro ao carregar as práticas.');
+                }
+            });
+        }
+
+        $(document).ready(function () {
+
+            $('#idInstituicao').change(function () {
+                var idInstituicao = $(this).val();
+
+                if (idInstituicao) {
+                    obterPraticas(idInstituicao);
+                } else {
+                    $('#idPratica').empty();
+                    $('#idPratica').append('<option value="">Selecione uma prática</option>');
+                }
+            });
+
+            $('#idInstituicao').val('@Model.idInstituicao').trigger('change');
+
+            $('#formEtapa2').submit(function (e) {
+                e.preventDefault();
+
+                var formData = $(this).serialize();
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    success: function (resposta) {
+                        if (resposta.sucesso) {
+                            window.location.href = '@Url.Action("NovoAgendamentoEtapa3", "Agendamento")';
+                        } else {
+                            exibirAlerta(resposta.mensagem);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        exibirAlerta('Erro ao finalizar etapa.');
+                    }
+                });
+            });
+        });
+    </script>
+}

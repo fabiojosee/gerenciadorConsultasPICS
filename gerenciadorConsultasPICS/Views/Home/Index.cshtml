@@ -1,8 +1,90 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Página Inicial";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container" style="display: flex; flex-direction: column; align-items: center;">
+    <svg class="icon" style="width: 10rem; height: 10rem;">
+        <use xlink:href="/images/sprite.svg#app-icon"></use>
+    </svg>
+
+    <a class="btn" asp-area="Usuario" asp-controller="Agendamento" asp-action="NovoAgendamentoEtapa1">Novo agendamento</a>
+    <a class="btn" onclick="exibirModalCpf()" href="#">Meus atendimentos</a>
+    <a class="btn" asp-area="Admin" asp-controller="Login" asp-action="Login">Área administrativa</a>
+
 </div>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        function aplicarMascaraCPF(cpf) {
+            return cpf
+                .replace(/\D/g, '')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        }
+
+        function validarCPF(cpf) {
+            cpf = cpf.replace(/[^\d]+/g, '');
+
+            if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) {
+                return false;
+            }
+
+            let soma = 0;
+            let resto;
+
+            for (let i = 1; i <= 9; i++) {
+                soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+            }
+
+            resto = (soma * 10) % 11;
+
+            if (resto === 10 || resto === 11) resto = 0;
+            if (resto !== parseInt(cpf.substring(9, 10))) return false;
+
+            soma = 0;
+            for (let i = 1; i <= 10; i++) {
+                soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+            }
+
+            resto = (soma * 10) % 11;
+
+            if (resto === 10 || resto === 11) resto = 0;
+            if (resto !== parseInt(cpf.substring(10, 11))) return false;
+
+            return true;
+        }
+
+        function exibirModalCpf() {
+            Swal.fire({
+                title: "Informe seu CPF",
+                input: "text",
+                inputLabel: "CPF",
+                inputAttributes: {
+                    maxlength: '14',
+                },
+                inputValidator: (value) => {
+                    let cpfComMascara = aplicarMascaraCPF(value);
+                    if (!validarCPF(cpfComMascara))
+                        return 'CPF inválido!';
+                },
+                didOpen: () => {
+                    const inputElement = Swal.getInput();
+
+                    inputElement.addEventListener('input', (e) => {
+                        e.target.value = aplicarMascaraCPF(e.target.value);
+                    });
+                },
+                showCancelButton: true,
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: 'LightSeaGreen'
+            }).then((resultado) => {
+                console.log(resultado)
+                if (resultado.isConfirmed) {
+                    window.location.href = '/Usuario/Atendimento/MeusAtendimentos?cpfPaciente=' + resultado.value;
+                }
+            });
+        }
+    </script>
+}

@@ -1,0 +1,119 @@
+﻿@model gerenciadorConsultasPICS.Areas.Usuario.ViewModels.Agendamento.Etapa4ViewModel
+@{
+    ViewData["Title"] = "Novo Agendamento - Etapa 4";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+}
+<div class="form-container">
+
+    <h1 class="titulo">Dados do paciente</h1>
+
+    <form id="formEtapa4" asp-action="NovoAgendamentoEtapa4" method="post">
+        <div class="form-group">
+            <label asp-for="nomePaciente">Nome</label>
+            <input asp-for="nomePaciente" name="nomePaciente" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label asp-for="cpfPaciente">CPF</label>
+            <input asp-for="cpfPaciente" name="cpfPaciente" class="form-control" required oninput="aplicarMascaraCPF(this)" maxlength="14" />
+        </div>
+        <div class="form-group">
+            <label asp-for="telefonePaciente">Telefone</label>
+            <input asp-for="telefonePaciente" name="telefonePaciente" class="form-control" required oninput="aplicarMascaraTelefone(this)" maxlength="15" />
+        </div>
+        <div class="form-group">
+            <label asp-for="emailPaciente">E-mail</label>
+            <input asp-for="emailPaciente" name="emailPaciente" type="email" required class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="dataNascimentoPaciente">Data de nascimento</label>
+            <input asp-for="dataNascimentoPaciente" id="dataNascimentoPaciente" name="dataNascimentoPaciente" type="text" required class="form-control" placeholder="__/__/____" />
+        </div>
+        <div class="form-group">
+            <label asp-for="generoPaciente">Gênero</label>
+            <select id="generoPaciente" name="generoPaciente" required class="form-select">
+                <option value="">Selecione uma opção</option>
+                <option value="1">Feminino</option>
+                <option value="2">Masculino</option>
+                <option value="3">Outros</option>
+                <option value="4">Não desejo informar</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label asp-for="grauAnsiedadePaciente">Grau de ansiedade (de 1 a 5)</label>
+            <input asp-for="grauAnsiedadePaciente" name="grauAnsiedadePaciente" required class="form-control" type="number" min="1" max="5" />
+        </div>
+
+        <button type="submit" class="btn">Salvar</button>
+    </form>
+
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
+    <script type="text/javascript">
+
+        function aplicarMascaraCPF(input) {
+            input.value = input.value
+                .replace(/\D/g, '')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d)/, '$1.$2')
+                .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        }
+
+        function aplicarMascaraTelefone(input) {
+            let telefone = input.value.replace(/\D/g, '');
+            if (telefone.length <= 10) {
+                telefone = telefone.replace(/(\d{2})(\d)/, "($1) $2");
+                telefone = telefone.replace(/(\d{4})(\d)/, "$1-$2");
+            } else {
+                telefone = telefone.replace(/(\d{2})(\d)/, "($1) $2");
+                telefone = telefone.replace(/(\d{5})(\d)/, "$1-$2");
+            }
+            input.value = telefone;
+        }
+
+        $(document).ready(function () {
+
+            $("#dataNascimentoPaciente").datepicker({
+                showAnim: "slideDown",
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "-100:+0",
+                dateFormat: 'dd/mm/yy',
+                dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'],
+                dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S', 'D'],
+                dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+                monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+                monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+            }).mask("99/99/9999");
+
+            $('#formEtapa4').submit(function (e) {
+                e.preventDefault();
+
+                // TODO: Implementar validação de CPF
+                // TODO: Implementar validação de campos obrigatórios
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (resposta) {
+                        if (resposta.sucesso) {
+                            window.location.href = '@Url.Action("Sucesso", "Agendamento")';
+                        } else {
+                            exibirAlerta(resposta.mensagem);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        exibirAlerta('Erro ao finalizar etapa.');
+                    }
+                });
+            });
+        });
+    </script>
+}

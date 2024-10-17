@@ -1,0 +1,73 @@
+﻿@using gerenciadorConsultasPICS.Areas.Admin.Enums
+@model List<gerenciadorConsultasPICS.Areas.Usuario.ViewModels.Atendimento.MeusAtendimentosViewModel>
+@{
+    ViewData["Title"] = "Meus Atendimentos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@* TODO: Corrigir posição do título *@
+<h1 class="titulo">Meus atendimentos</h1>
+
+<div class="list-container">
+
+    <div class="mt-4">
+
+        @foreach (var item in Model)
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>@item.nomePratica</span>
+                        <span class="fw-bold status-@item.status">@item.statusAtendimento</span>
+                    </div>
+                    <p class="mb-1" style="text-align: start;">@item.cidadePaciente, @item.estadoPaciente</p>
+                    <p class="mb-0" style="text-align: start;">@item.dataAtendimento</p>
+
+                    @if (item.status == (byte)StatusAtendimento.Agendado)
+                    {
+                        <button type="button" class="btn-cancelar" onclick="cancelarAtendimento(@item.idAtendimento)">Cancelar atendimento</button>
+                    }
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        function cancelarAtendimento(idAtendimento) {
+            Swal.fire({
+                title: "Caso cancele esse atendimento todos os outros atendimentos do mesmo agendamento serão cancelados, deseja prosseguir?",
+                showCancelButton: true,
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: 'LightSeaGreen',
+                confirmButtonText: 'Confirmar'
+            }).then((resultado) => {
+                if (resultado.isConfirmed) {
+                    $.ajax({
+                        url: '/Usuario/Atendimento/CancelarAtendimento',
+                        type: 'PUT',
+                        data: { idAtendimento: idAtendimento },
+                        success: function (resposta) {
+                            if (resposta.sucesso) {
+                                Swal.fire({
+                                    title: "Atendimentos cancelados com sucesso!",
+                                    confirmButtonColor: 'LightSeaGreen',
+                                    icon: "success"
+                                }).then((resultado) => { window.location.reload(true); });
+                            } else {
+                                exibirAlerta(resposta.mensagem);
+                            }
+                        },
+                        error: function () {
+                            exibirAlerta('Erro ao cancelar atendimento.');
+                        }
+                    });
+                }
+            });
+        }
+
+    </script>
+}
