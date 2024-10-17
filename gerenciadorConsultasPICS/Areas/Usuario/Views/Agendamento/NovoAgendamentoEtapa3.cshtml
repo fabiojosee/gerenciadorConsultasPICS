@@ -1,0 +1,84 @@
+﻿@model gerenciadorConsultasPICS.Areas.Usuario.ViewModels.Agendamento.Etapa3ViewModel
+@{
+    ViewData["Title"] = "Novo Agendamento - Etapa 3";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+}
+
+<div class="container">
+
+    <h1>Selecione a data para iniciar os atendimentos</h1>
+
+    <form id="formEtapa3" asp-action="NovoAgendamentoEtapa3" method="post">
+        <div class="form-group">
+            <label asp-for="dataInicio"></label>
+            <input asp-for="dataInicio" id="dataInicio" name="dataInicio" type="text"
+                   value="@Model.dataInicio?.ToString("dd/MM/yyyy")" required class="form-control" placeholder="__/__/____" readonly="readonly" />
+        </div>
+
+        <button type="submit" class="btn">Continuar</button>
+    </form>
+
+</div>
+
+
+@section Scripts {
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.10/jquery.mask.js"></script>
+    <script type="text/javascript">
+
+        function restringirDiaDaSemana(date) {
+            const day = date.getDay();
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (day === parseInt('@ViewBag.DiaPermitidoParaAgendamento') && date >= today) {
+                return [true];
+            } else {
+                return [false];
+            }
+        }
+
+        $(document).ready(function () {
+
+            $("#dataInicio").datepicker({
+                showAnim: "slideDown",
+                changeMonth: true,
+                changeYear: true,
+                beforeShowDay: restringirDiaDaSemana,
+                minDate: 0,
+                dateFormat: 'dd/mm/yy',
+                dayNames: ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'],
+                dayNamesMin: ['D', 'S', 'T', 'Q', 'Q', 'S', 'S', 'D'],
+                dayNamesShort: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'],
+                monthNames: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'],
+                monthNamesShort: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']
+            }).mask("99/99/9999");
+
+            $('#formEtapa3').submit(function (e) {
+                e.preventDefault();
+
+                var formData = $(this).serialize();
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    success: function (resposta) {
+                        if (resposta.sucesso) {
+                            window.location.href = '@Url.Action("NovoAgendamentoEtapa4", "Agendamento")';
+                        } else {
+                            exibirAlerta(resposta.mensagem);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        exibirAlerta('Erro ao finalizar etapa.');
+                    }
+                });
+            });
+        });
+    </script>
+}

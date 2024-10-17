@@ -1,0 +1,110 @@
+﻿@model gerenciadorConsultasPICS.Areas.Usuario.ViewModels.Agendamento.Etapa1ViewModel
+@{
+    ViewData["Title"] = "Novo Agendamento - Etapa 1";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+
+    <h1>Para iniciar o agendamento selecione o estado e a cidade na qual reside</h1>
+
+    <form id="formEtapa1" asp-action="NovoAgendamentoEtapa1" method="post">
+        <div class="form-group">
+            <label asp-for="idEstadoPaciente" class="form-label">Estado</label>
+            <select id="idEstadoPaciente" name="idEstadoPaciente" required class="form-select">
+                <option value="">Selecione um estado</option>
+                @foreach (var estado in ViewBag.Estados)
+                {
+                    if (estado.idEstado == Model.idEstadoPaciente)
+                    {
+                        <option value="@estado.idEstado" selected>@estado.nome (@estado.sigla)</option>
+                    }
+                    else
+                    {
+                        <option value="@estado.idEstado">@estado.nome (@estado.sigla)</option>
+                    }
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label asp-for="idCidadePaciente">Cidade</label>
+            <select id="idCidadePaciente" name="idCidadePaciente" required class="form-select">
+                <option value="">Selecione uma cidade</option>
+            </select>
+        </div>
+
+        <button type="submit" id="btnContinuar" class="btn">Continuar</button>
+    </form>
+
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        function obterCidades(idEstado) {
+            $.ajax({
+                url: '/Admin/Cidade/ObterCidades',
+                type: 'GET',
+                data: { idEstado: idEstado },
+                success: function (resposta) {
+                    if (resposta.sucesso) {
+                        $('#idCidadePaciente').empty();
+                        $('#idCidadePaciente').append('<option value="">Selecione uma cidade</option>');
+
+                        $.each(resposta.listaCidades, function (index, cidade) {
+                            if ('@Model.idCidadePaciente' == cidade.idCidade) {
+                                $('#idCidadePaciente').append('<option value="' + cidade.idCidade + '" selected>' + cidade.nome + '</option>');
+                            } else {
+                                $('#idCidadePaciente').append('<option value="' + cidade.idCidade + '">' + cidade.nome + '</option>');
+                            }
+                        });
+                    } else {
+                        exibirAlerta(resposta.mensagem);
+                    }
+                },
+                error: function () {
+                    exibirAlerta('Erro ao carregar as cidades.');
+                }
+            });
+        }
+
+        $(document).ready(function () {
+
+            $('#idEstadoPaciente').change(function () {
+                var idEstado = $(this).val();
+
+                if (idEstado) {
+                    obterCidades(idEstado);
+                } else {
+                    $('#idCidadePaciente').empty();
+                    $('#idCidadePaciente').append('<option value="">Selecione uma cidade</option>');
+                }
+            });
+
+            $('#idEstadoPaciente').val('@Model.idEstadoPaciente').trigger('change');
+
+            $('#formEtapa1').submit(function (e) {
+                e.preventDefault();
+
+                var formData = $(this).serialize();
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    success: function (resposta) {
+                        if (resposta.sucesso) {
+                            window.location.href = '@Url.Action("NovoAgendamentoEtapa2", "Agendamento")';
+                        } else {
+                            exibirAlerta(resposta.mensagem);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        exibirAlerta('Erro ao finalizar etapa.');
+                    }
+                });
+            });
+
+        });
+    </script>
+}
