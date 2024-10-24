@@ -1,5 +1,60 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container container-centralizado">
+
+    <h1>Área administrativa</h1>
+
+    <form id="formLogin">
+        <div>
+            <label for="login" class="form-label">Login</label>
+            <input type="text" id="login" name="login" class="form-control" required />
+        </div>
+        <div>
+            <label for="senha" class="form-label">Senha</label>
+            <input type="password" id="senha" name="senha" class="form-control" required />
+        </div>
+
+        <button type="submit" class="btn">Entrar</button>
+    </form>
+
+    <a href="/Admin/Login/RecuperacaoSenha">Esqueci minha senha</a>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLScUA-toEKZB6TBkgGcDdS5wFokAXZlC5nbVT9RubD9XjSQnaw/viewform?usp=sf_link" target="_blank">Solicitar cadastro de instituição</a>
+
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('#formLogin').submit(function (e) {
+                e.preventDefault();
+
+                var formData = $(this).serialize();
+
+                $.ajax({
+                    url: '@Url.Action("Login", "Login")',
+                    type: 'POST',
+                    data: formData,
+                    success: function (resposta) {
+                        if (resposta.sucesso) {
+                            if (resposta.idPerfil == 1) {
+                                window.location.href = '@Url.Action("AreaAdministrativa", "Login")';
+                            } else {
+                                window.location.href = '@Url.Action("AreaAdministrativaInstituicao", "Login")';
+                            }
+                        } else {
+                            exibirAlerta(resposta.mensagem);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        exibirAlerta('Erro ao realizar login.');
+                    }
+                });
+            });
+        });
+    </script>
 }

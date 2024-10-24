@@ -1,9 +1,7 @@
+using gerenciadorConsultasPICS.Configurations;
 using gerenciadorConsultasPICS.Data;
-using gerenciadorConsultasPICS.Repositories;
-using gerenciadorConsultasPICS.Repositories.Interfaces;
-using gerenciadorConsultasPICS.Services;
-using gerenciadorConsultasPICS.Services.Interfaces;
 using gerenciadorConsultasPICS.Utils;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,23 +38,24 @@ builder.Services.AddSession(options =>
     options.IdleTimeout = TimeSpan.FromSeconds(120);
 });
 
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Home/Login";
+                    options.AccessDeniedPath = "/Home/Login";
+                });
+
+builder.Services.AddAuthorization();
+
 builder.Services.AddMvc()
                 .AddSessionStateTempDataProvider();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-builder.Services.AddScoped<IAgendamentoRepository, AgendamentoRepository>();
-builder.Services.AddScoped<IAtendimentoRepository, AtendimentoRepository>();
-builder.Services.AddScoped<ICidadeRepository, CidadeRepository>();
-builder.Services.AddScoped<IEstadoRepository, EstadoRepository>();
-builder.Services.AddScoped<IInstituicaoRepository, InstituicaoRepository>();
-builder.Services.AddScoped<IPraticaRepository, PraticaRepository>();
-builder.Services.AddScoped<IPraticaInstituicaoRepository, PraticaInstituicaoRepository>();
-
 builder.Services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));
-builder.Services.AddTransient<IEmailService, EmailService>();
+
+builder.Services.ConfigureServices();
 
 var app = builder.Build();
 
@@ -78,6 +77,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

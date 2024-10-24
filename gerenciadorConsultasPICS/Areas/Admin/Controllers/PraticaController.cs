@@ -27,5 +27,11 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Controllers
             else
                 return Json(new { sucesso = false, mensagem = "Nenhuma prática encontrada para a instituição informada." });
         }
+
+        [HttpGet]
+        public IActionResult MinhasPraticas()
+        {
+            return View();
+        }
     }
 }

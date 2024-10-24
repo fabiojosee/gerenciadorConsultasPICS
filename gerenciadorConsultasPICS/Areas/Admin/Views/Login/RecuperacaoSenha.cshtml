@@ -1,5 +1,49 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@{
+    ViewData["Title"] = "Recuperação de senha";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+
+    <h1>Recuperação de senha</h1>
+
+    <form id="formRecuperacaoSenha">
+        <div>
+            <label for="email" class="form-label">E-mail</label>
+            <input type="email" id="email" name="email" class="form-control" required />
+        </div>
+
+        <p>Um código será enviado para o e-mail cadastrado e deve ser informado na próxima etapa da recuperação de senha.</p>
+
+        <button type="submit" class="btn">Continuar</button>
+    </form>
+
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('#formRecuperacaoSenha').submit(function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: '@Url.Action("EnviarCodigoRecuperacaoSenha", "Login")',
+                    type: 'POST',
+                    data: { email: $('#email').val() },
+                    success: function (resposta) {
+                        if (resposta.sucesso) {
+                            window.location.href = '@Url.Action("RecuperacaoSenhaCodigo", "Login")';
+                        } else {
+                            exibirAlerta(resposta.mensagem);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        exibirAlerta('Erro ao enviar código de recuperação de senha.');
+                    }
+                });
+            });
+        });
+    </script>
 }

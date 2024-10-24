@@ -4,7 +4,7 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Models
 {
     public class Instituicao
     {
-        public Instituicao(int idInstituicao, string nome, string descricao, Int16 idEstado, int idCidade, string cnpj, string cep)
+        public Instituicao(int idInstituicao, string nome, string descricao, Int16 idEstado, int idCidade, string cnpj, string cep, string email)
         {
             this.idInstituicao = idInstituicao;
             this.nome = nome;
@@ -13,6 +13,7 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Models
             this.idCidade = idCidade;
             this.cnpj = cnpj;
             this.cep = cep;
+            this.email = email;
         }
 
         [Key]
@@ -23,5 +24,6 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Models
         public int idCidade { get; private set; }
         public string cnpj { get; private set; }
         public string cep { get; private set; }
+        public string email { get; private set; }
     }
 }

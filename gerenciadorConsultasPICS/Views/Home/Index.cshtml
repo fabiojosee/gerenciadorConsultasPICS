@@ -2,14 +2,14 @@
     ViewData["Title"] = "Página Inicial";
 }
 
-<div class="container" style="display: flex; flex-direction: column; align-items: center;">
+<div class="container container-centralizado">
     <svg class="icon" style="width: 10rem; height: 10rem;">
         <use xlink:href="/images/sprite.svg#app-icon"></use>
     </svg>
 
-    <a class="btn" asp-area="Usuario" asp-controller="Agendamento" asp-action="NovoAgendamentoEtapa1">Novo agendamento</a>
-    <a class="btn" onclick="exibirModalCpf()" href="#">Meus atendimentos</a>
-    <a class="btn" asp-area="Admin" asp-controller="Login" asp-action="Login">Área administrativa</a>
+    <a class="btn" href="/Usuario/Agendamento/NovoAgendamentoEtapa1">Novo agendamento</a>
+    <a class="btn" href="#" onclick="exibirModalCpf()">Meus atendimentos</a>
+    <a class="btn" href="/Admin/Login/Login">Área administrativa</a>
 
 </div>
 
@@ -80,7 +80,6 @@
                 cancelButtonText: 'Cancelar',
                 confirmButtonColor: 'LightSeaGreen'
             }).then((resultado) => {
-                console.log(resultado)
                 if (resultado.isConfirmed) {
                     window.location.href = '/Usuario/Atendimento/MeusAtendimentos?cpfPaciente=' + resultado.value;
                 }

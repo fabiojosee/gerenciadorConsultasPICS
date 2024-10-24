@@ -141,3 +141,9 @@ h1 {
     cursor: pointer;
     z-index: 999;
 }
+
+.container-centralizado {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

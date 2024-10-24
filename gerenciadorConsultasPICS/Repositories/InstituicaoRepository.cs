@@ -13,5 +13,10 @@ namespace gerenciadorConsultasPICS.Repositories
         {
             return await _context.Instituicao.Where(x => x.idEstado == idEstado).ToListAsync();
         }
+
+        public async Task<Instituicao?> ObterPorEmail(string email)
+        {
+            return await _context.Instituicao.Where(x => x.email == email).FirstOrDefaultAsync();
+        }
     }
 }
