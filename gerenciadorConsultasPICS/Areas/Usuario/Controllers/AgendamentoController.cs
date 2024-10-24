@@ -1,5 +1,6 @@
 ﻿using gerenciadorConsultasPICS.Areas.Usuario.Models;
 using gerenciadorConsultasPICS.Areas.Usuario.ViewModels.Agendamento;
+using gerenciadorConsultasPICS.Helpers;
 using gerenciadorConsultasPICS.Repositories.Interfaces;
 using gerenciadorConsultasPICS.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -252,7 +253,7 @@ namespace gerenciadorConsultasPICS.Areas.Usuario.Controllers
             }
 
             // TODO: Adicionar informações do local/instituição, horário de atendimento e que funcionamento é por chegada
-            var mensagem = _emailService.GerarTemplateEmail("Você possui novos atendimentos agendados para as seguintes datas:", listaDatasAgendadas);
+            var mensagem = EmailHelper.GerarTemplateEmail("Você possui novos atendimentos agendados para as seguintes datas:", listaDatasAgendadas);
 
             await _emailService.EnviarEmailAsync(novoAgendamentoViewModel.emailPaciente, "Agendamento realizado com sucesso!", mensagem);
 

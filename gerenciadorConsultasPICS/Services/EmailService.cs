@@ -39,24 +39,5 @@ namespace gerenciadorConsultasPICS.Services
 
             await client.SendMailAsync(mailMessage);
         }
-
-        public string GerarTemplateEmail(string titulo, List<string> linhas)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine("<html>");
-            sb.AppendLine("<body>");
-            sb.AppendLine($"<h1>{titulo}</h1>");
-            sb.AppendLine("<p>");
-
-            foreach (var linha in linhas)
-            {
-                sb.AppendLine($"{linha}<br>");
-            }
-
-            sb.AppendLine("</p>");
-            sb.AppendLine("</body>");
-            sb.AppendLine("</html>");
-            return sb.ToString();
-        }
     }
 }

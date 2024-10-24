@@ -17,5 +17,6 @@ namespace gerenciadorConsultasPICS.Data
         public DbSet<Cidade> Cidade { get; set; }
         public DbSet<Estado> Estado { get; set; }
         public DbSet<PraticaInstituicao> PraticaInstituicao { get; set; }
+        public DbSet<Usuario> Usuario { get; set; }
     }
 }

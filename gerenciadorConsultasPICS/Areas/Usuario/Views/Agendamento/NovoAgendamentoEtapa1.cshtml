@@ -8,9 +8,9 @@
 
     <h1>Para iniciar o agendamento selecione o estado e a cidade na qual reside</h1>
 
-    <form id="formEtapa1" asp-action="NovoAgendamentoEtapa1" method="post">
+    <form id="formEtapa1">
         <div class="form-group">
-            <label asp-for="idEstadoPaciente" class="form-label">Estado</label>
+            <label for="idEstadoPaciente" class="form-label">Estado</label>
             <select id="idEstadoPaciente" name="idEstadoPaciente" required class="form-select">
                 <option value="">Selecione um estado</option>
                 @foreach (var estado in ViewBag.Estados)
@@ -27,7 +27,7 @@
             </select>
         </div>
         <div class="form-group">
-            <label asp-for="idCidadePaciente">Cidade</label>
+            <label for="idCidadePaciente" class="form-label">Cidade</label>
             <select id="idCidadePaciente" name="idCidadePaciente" required class="form-select">
                 <option value="">Selecione uma cidade</option>
             </select>
@@ -89,7 +89,7 @@
                 var formData = $(this).serialize();
 
                 $.ajax({
-                    url: $(this).attr('action'),
+                    url: '@Url.Action("NovoAgendamentoEtapa1", "Agendamento")',
                     type: 'POST',
                     data: formData,
                     success: function (resposta) {

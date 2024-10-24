@@ -6,10 +6,11 @@
 
 <div class="container">
 
-    <form id="formEtapa2" asp-action="NovoAgendamentoEtapa2" method="post">
+    <h1>Agora, informe a prática desejada para os atendimentos e a instituição onde deseja ser atendido</h1>
+    
+    <form id="formEtapa2">
         <div class="form-group">
-            <h1 asp-for="idInstituicao">Selecione a instituição que deseja receber o atendimento</h1>
-
+            <label for="idInstituicao" class="form-label">Instituição</label>
             <select id="idInstituicao" name="idInstituicao" required class="form-select">
                 <option value="">Selecione uma instituição</option>
                 @foreach (var instituicao in ViewBag.Instituicoes)
@@ -26,7 +27,7 @@
             </select>
         </div>
         <div class="form-group">
-            <h1 asp-for="idPratica">Selecione a prática desejada para os atendimentos</h1>
+            <label for="idPratica" class="form-label">Prática</label>
             <select id="idPratica" name="idPratica" required class="form-select">
                 <option value="">Selecione uma prática</option>
             </select>
@@ -88,7 +89,7 @@
                 var formData = $(this).serialize();
 
                 $.ajax({
-                    url: $(this).attr('action'),
+                    url: '@Url.Action("NovoAgendamentoEtapa2", "Agendamento")',
                     type: 'POST',
                     data: formData,
                     success: function (resposta) {

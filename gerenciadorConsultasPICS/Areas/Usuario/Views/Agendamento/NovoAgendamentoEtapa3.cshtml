@@ -12,11 +12,11 @@
 
     <h1>Selecione a data para iniciar os atendimentos</h1>
 
-    <form id="formEtapa3" asp-action="NovoAgendamentoEtapa3" method="post">
+    <form id="formEtapa3">
         <div class="form-group">
-            <label asp-for="dataInicio"></label>
-            <input asp-for="dataInicio" id="dataInicio" name="dataInicio" type="text"
-                   value="@Model.dataInicio?.ToString("dd/MM/yyyy")" required class="form-control" placeholder="__/__/____" readonly="readonly" />
+            <label for="dataInicio" class="form-label">Data início</label>
+            <input id="dataInicio" name="dataInicio" type="text" value="@Model.dataInicio?.ToString("dd/MM/yyyy")"
+                   required class="form-control" placeholder="__/__/____" readonly="readonly" />
         </div>
 
         <button type="submit" class="btn">Continuar</button>
@@ -64,7 +64,7 @@
                 var formData = $(this).serialize();
 
                 $.ajax({
-                    url: $(this).attr('action'),
+                    url: '@Url.Action("NovoAgendamentoEtapa3", "Agendamento")',
                     type: 'POST',
                     data: formData,
                     success: function (resposta) {

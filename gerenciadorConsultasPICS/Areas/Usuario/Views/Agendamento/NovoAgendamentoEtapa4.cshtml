@@ -11,29 +11,29 @@
 
     <h1 class="titulo">Dados do paciente</h1>
 
-    <form id="formEtapa4" asp-action="NovoAgendamentoEtapa4" method="post">
+    <form id="formEtapa4">
         <div class="form-group">
-            <label asp-for="nomePaciente">Nome</label>
-            <input asp-for="nomePaciente" name="nomePaciente" class="form-control" required />
+            <label for="nomePaciente" class="form-label">Nome</label>
+            <input id="nomePaciente" name="nomePaciente" class="form-control" required />
         </div>
         <div class="form-group">
-            <label asp-for="cpfPaciente">CPF</label>
-            <input asp-for="cpfPaciente" name="cpfPaciente" class="form-control" required oninput="aplicarMascaraCPF(this)" maxlength="14" />
+            <label for="cpfPaciente" class="form-label">CPF</label>
+            <input id="cpfPaciente" name="cpfPaciente" class="form-control" required oninput="aplicarMascaraCPF(this)" maxlength="14" />
         </div>
         <div class="form-group">
-            <label asp-for="telefonePaciente">Telefone</label>
-            <input asp-for="telefonePaciente" name="telefonePaciente" class="form-control" required oninput="aplicarMascaraTelefone(this)" maxlength="15" />
+            <label for="telefonePaciente" class="form-label">Telefone</label>
+            <input id="telefonePaciente" name="telefonePaciente" class="form-control" required oninput="aplicarMascaraTelefone(this)" maxlength="15" />
         </div>
         <div class="form-group">
-            <label asp-for="emailPaciente">E-mail</label>
-            <input asp-for="emailPaciente" name="emailPaciente" type="email" required class="form-control" />
+            <label for="emailPaciente" class="form-label">E-mail</label>
+            <input id="emailPaciente" name="emailPaciente" type="email" required class="form-control" />
         </div>
         <div class="form-group">
-            <label asp-for="dataNascimentoPaciente">Data de nascimento</label>
-            <input asp-for="dataNascimentoPaciente" id="dataNascimentoPaciente" name="dataNascimentoPaciente" type="text" required class="form-control" placeholder="__/__/____" />
+            <label for="dataNascimentoPaciente" class="form-label">Data de nascimento</label>
+            <input id="dataNascimentoPaciente" name="dataNascimentoPaciente" type="text" required class="form-control" placeholder="__/__/____" />
         </div>
         <div class="form-group">
-            <label asp-for="generoPaciente">Gênero</label>
+            <label for="generoPaciente" class="form-label">Gênero</label>
             <select id="generoPaciente" name="generoPaciente" required class="form-select">
                 <option value="">Selecione uma opção</option>
                 <option value="1">Feminino</option>
@@ -43,8 +43,8 @@
             </select>
         </div>
         <div class="form-group">
-            <label asp-for="grauAnsiedadePaciente">Grau de ansiedade (de 1 a 5)</label>
-            <input asp-for="grauAnsiedadePaciente" name="grauAnsiedadePaciente" required class="form-control" type="number" min="1" max="5" />
+            <label for="grauAnsiedadePaciente" class="form-label">Grau de ansiedade (de 1 a 5)</label>
+            <input id="grauAnsiedadePaciente" name="grauAnsiedadePaciente" required class="form-control" type="number" min="1" max="5" />
         </div>
 
         <button type="submit" class="btn">Salvar</button>
@@ -96,10 +96,9 @@
                 e.preventDefault();
 
                 // TODO: Implementar validação de CPF
-                // TODO: Implementar validação de campos obrigatórios
 
                 $.ajax({
-                    url: $(this).attr('action'),
+                    url: '@Url.Action("NovoAgendamentoEtapa4", "Agendamento")',
                     type: 'POST',
                     data: $(this).serialize(),
                     success: function (resposta) {

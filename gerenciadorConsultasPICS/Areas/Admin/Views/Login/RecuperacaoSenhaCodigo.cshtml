@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Recuperação de senha";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+
+    <h1>Recuperação de senha</h1>
+
+    <form id="formRecuperacaoSenhaCodigo">
+        <div>
+            <label for="codigo" class="form-label">Código</label>
+            <input type="text" id="codigo" name="codigo" class="form-control" required />
+        </div>
+
+        <div>
+            <label for="senha" class="form-label">Nova senha</label>
+            <input type="password" id="senha" name="senha" class="form-control" required />
+        </div>
+
+        <div>
+            <label for="confirmacaoSenha" class="form-label">Confirmar senha</label>
+            <input type="password" id="confirmacaoSenha" name="confirmacaoSenha" class="form-control" required />
+        </div>
+
+        <button type="submit" class="btn">Enviar</button>
+    </form>
+
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('#formRecuperacaoSenhaCodigo').submit(function (e) {
+                e.preventDefault();
+
+                var formData = $(this).serialize();
+
+                $.ajax({
+                    url: '@Url.Action("AlterarSenha", "Login")',
+                    type: 'PUT',
+                    data: formData,
+                    success: function (resposta) {
+                        if (resposta.sucesso) {
+                            window.location.href = '@Url.Action("RecuperacaoSenhaSucesso", "Login")';
+                        } else {
+                            exibirAlerta(resposta.mensagem);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        exibirAlerta('Erro ao alterar senha.');
+                    }
+                });
+            });
+        });
+    </script>
+}
