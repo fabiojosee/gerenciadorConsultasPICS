@@ -1,0 +1,23 @@
+﻿@{
+    ViewData["Title"] = "Sucesso";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+
+    <svg class="icon" style="width: 10rem; height: 10rem;">
+        <use xlink:href="/images/sprite.svg?v=1.0#success-icon"></use>
+    </svg>
+
+    <h2 style="color: #02542D">Prática vinculada com sucesso!</h2>
+
+    @if (Convert.ToByte(ViewBag.idPerfil) == (byte)gerenciadorConsultasPICS.Areas.Admin.Enums.Perfil.Admin)
+    {
+        <a href="/Admin/Login/AreaAdministrativa" class="btn">OK</a>
+    }
+    else
+    {
+        <a href="/Admin/Pratica/MinhasPraticas" class="btn">OK</a>
+    }
+
+</div>

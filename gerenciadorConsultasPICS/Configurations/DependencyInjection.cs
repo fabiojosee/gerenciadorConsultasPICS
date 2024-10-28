@@ -26,6 +26,7 @@ namespace gerenciadorConsultasPICS.Configurations
             #region Services
 
             services.AddTransient<IEmailService, EmailService>();
+            services.AddTransient<ITokenService, TokenService>();
 
             #endregion
         }

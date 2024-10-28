@@ -1,0 +1,90 @@
+﻿@model gerenciadorConsultasPICS.Areas.Admin.ViewModels.Pratica.VinculoPraticaViewModel
+@{
+    ViewData["Title"] = "Vincular prática - Admin";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="form-container">
+
+    <h1 class="titulo">Vincular prática</h1>
+
+    <form id="formVincularPraticaAdmin">
+        <div class="form-group">
+            <label for="idInstituicao" class="form-label">Instituição</label>
+            <select id="idInstituicao" name="idInstituicao" required class="form-select">
+                <option value="">Selecione uma instituição</option>
+                @foreach (var instituicao in ViewBag.Instituicoes)
+                {
+                    <option value="@instituicao.idInstituicao">@instituicao.nome</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="idPratica" class="form-label">Prática</label>
+            <select id="idPratica" name="idPratica" required class="form-select">
+                <option value="">Selecione uma prática</option>
+                @foreach (var instituicao in ViewBag.Praticas)
+                {
+                    <option value="@instituicao.idPratica">@instituicao.nome</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="periodicidade" class="form-label">Periodicidade</label>
+            <select id="periodicidade" name="periodicidade" required class="form-select">
+                <option value="">Selecione</option>
+                <option value="1">Dia</option>
+                <option value="2">Semana</option>
+                <option value="3">Mês</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="diaPermitidoParaAgendamento" class="form-label">Dia da semana para os atendimentos</label>
+            <select id="diaPermitidoParaAgendamento" name="diaPermitidoParaAgendamento" required class="form-select">
+                <option value="">Selecione</option>
+                <option value="0">Domingo</option>
+                <option value="1">Segunda-feira</option>
+                <option value="2">Terça-feira</option>
+                <option value="3">Quarta-feira</option>
+                <option value="4">Quinta-feira</option>
+                <option value="5">Sexta-feira</option>
+                <option value="6">Sábado</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="qtdSessoes" class="form-label">Quantidade de sessões</label>
+            <input id="qtdSessoes" name="qtdSessoes" type="number" min="0" required class="form-control" />
+        </div>
+
+        <button type="submit" class="btn">Salvar</button>
+    </form>
+
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('#formVincularPraticaAdmin').submit(function (e) {
+                e.preventDefault();
+
+                $.ajax({
+                    url: '@Url.Action("VincularPratica", "Pratica")',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function (resposta) {
+                        if (resposta.sucesso) {
+                            window.location.href = '@Url.Action("VinculoPraticaSucesso", "Pratica")';
+                        } else {
+                            exibirAlerta(resposta.mensagem);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        exibirAlerta('Erro ao vincular prática.');
+                    }
+                });
+            });
+        });
+    </script>
+}

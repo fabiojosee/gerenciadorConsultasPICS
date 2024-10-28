@@ -41,11 +41,17 @@ builder.Services.AddSession(options =>
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
-                    options.LoginPath = "/Home/Login";
-                    options.AccessDeniedPath = "/Home/Login";
+                    options.LoginPath = "/Admin/Login/Login";
+                    options.AccessDeniedPath = "/Home/AcessoNegado";
                 });
 
-builder.Services.AddAuthorization();
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("ApenasAdmin", policy => policy.RequireClaim("idPerfil", "1"));
+    options.AddPolicy("ApenasInstituicao", policy => policy.RequireClaim("idPerfil", "2"));
+});
 
 builder.Services.AddMvc()
                 .AddSessionStateTempDataProvider();
