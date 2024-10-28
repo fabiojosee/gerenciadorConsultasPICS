@@ -13,9 +13,14 @@ namespace gerenciadorConsultasPICS.Repositories
             _context = context;
         }
 
-        public async Task<T> ObterPorIdAsync(int id)
+        public async Task<T> ObterPorIdAsync(object id)
         {
             return await _context.Set<T>().FindAsync(id);
+        }
+
+        public async Task<T> ObterPorIdAsync(object?[] ids)
+        {
+            return await _context.Set<T>().FindAsync(ids);
         }
 
         public async Task<IEnumerable<T>> ObterTodosAsync()
@@ -35,9 +40,16 @@ namespace gerenciadorConsultasPICS.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task RemoverAsync(int id)
+        public async Task RemoverAsync(object id)
         {
             var entidade = await ObterPorIdAsync(id);
+            _context.Set<T>().Remove(entidade);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RemoverAsync(object?[] ids)
+        {
+            var entidade = await ObterPorIdAsync(ids);
             _context.Set<T>().Remove(entidade);
             await _context.SaveChangesAsync();
         }

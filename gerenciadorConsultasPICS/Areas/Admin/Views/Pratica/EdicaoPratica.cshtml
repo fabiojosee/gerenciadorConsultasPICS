@@ -1,0 +1,55 @@
+﻿@model gerenciadorConsultasPICS.Areas.Admin.ViewModels.Pratica.PraticaViewModel
+@{
+    ViewData["Title"] = "Edição de prática";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container container-centralizado">
+
+    <h1>Dados da prática</h1>
+
+    <form id="formEdicaoPratica">
+        <input type="hidden" id="idPratica" name="idPratica" value="@Model.idPratica" />
+        <div>
+            <label for="nome" class="form-label">Nome</label>
+            <input type="text" id="nome" name="nome" class="form-control" value="@Model.nome" required />
+        </div>
+        <div>
+            <label for="descricao" class="form-label">Descrição</label>
+            <input type="text" id="descricao" name="descricao" class="form-control" value="@Model.descricao" />
+        </div>
+
+        <button type="submit" class="btn">Salvar</button>
+    </form>
+
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+
+            $('#formEdicaoPratica').submit(function (e) {
+                e.preventDefault();
+
+                var formData = $(this).serialize();
+
+                $.ajax({
+                    url: '@Url.Action("EditarPratica", "Pratica")',
+                    type: 'PUT',
+                    data: formData,
+                    success: function (resposta) {
+                        if (resposta.sucesso) {
+                            window.location.href = '@Url.Action("EdicaoPraticaSucesso", "Pratica")';
+                        } else {
+                            exibirAlerta(resposta.mensagem);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        exibirAlerta('Erro ao editar prática.');
+                    }
+                });
+            });
+        });
+    </script>
+}

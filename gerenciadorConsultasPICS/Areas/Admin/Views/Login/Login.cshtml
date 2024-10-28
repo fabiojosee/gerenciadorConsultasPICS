@@ -41,7 +41,7 @@
                     data: formData,
                     success: function (resposta) {
                         if (resposta.sucesso) {
-                            if (resposta.idPerfil == 1) {
+                            if (resposta.idPerfil == '@((byte)gerenciadorConsultasPICS.Areas.Admin.Enums.Perfil.Admin)') {
                                 window.location.href = '@Url.Action("AreaAdministrativa", "Login")';
                             } else {
                                 window.location.href = '@Url.Action("AreaAdministrativaInstituicao", "Login")';

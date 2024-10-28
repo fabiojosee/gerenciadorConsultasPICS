@@ -63,6 +63,7 @@ body {
 .btn-cancelar {
     float: right;
     width: 200px;
+    margin: 10px auto;
     padding: 15px;
     color: white;
     background-color: #ff6060;

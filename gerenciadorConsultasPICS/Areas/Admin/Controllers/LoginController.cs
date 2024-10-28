@@ -3,6 +3,7 @@ using gerenciadorConsultasPICS.Repositories.Interfaces;
 using gerenciadorConsultasPICS.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -46,7 +47,9 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Controllers
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, login)
+                new Claim("login", usuario.login),
+                new Claim("idPerfil", usuario.idPerfil.ToString()),
+                new Claim("idInstituicao", usuario.idInstituicao is null ? "" : usuario.idInstituicao.Value.ToString())
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -127,12 +130,14 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "ApenasAdmin")]
         public IActionResult AreaAdministrativa()
         {
             return View();
         }
 
         [HttpGet]
+        [Authorize(Policy = "ApenasInstituicao")]
         public IActionResult AreaAdministrativaInstituicao()
         {
             return View();

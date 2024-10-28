@@ -1,6 +1,6 @@
-﻿@model List<gerenciadorConsultasPICS.Areas.Admin.ViewModels.Pratica.MinhasPraticasViewModel>
+﻿@model List<gerenciadorConsultasPICS.Areas.Admin.Models.Pratica>
 @{
-    ViewData["Title"] = "Minhas práticas";
+    ViewData["Title"] = "Minhas práticas - Admin";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -15,18 +15,16 @@
             <div class="card mb-3">
                 <div class="card-body">
                     <p class="mb-1" style="text-align: start;">@item.nome</p>
-                    <p class="mb-1" style="text-align: start;">@item.textoPeriodicidade</p>
-                    <p class="mb-1" style="text-align: start;">@item.textoQtdSessoes</p>
-                    <p class="mb-1" style="text-align: start;">@item.textoDiaPermitidoParaAgendamento</p>
+                    <p class="mb-1" style="text-align: start;">@item.descricao</p>
                     <button type="button" class="btn" onclick="editarPratica(@item.idPratica)">Editar prática</button>
-                    <button type="button" class="btn-cancelar" onclick="desvincularPratica(@item.idPratica, @item.idInstituicao)">Desvincular prática</button>
+                    <button type="button" class="btn-cancelar" onclick="excluirPratica(@item.idPratica)">Excluir prática</button>
                 </div>
             </div>
         }
 
     </div>
 
-    <button type="button" class="btn" id="btnVincularPratica">Vincular prática</button>
+    <button type="button" class="btn" id="btnNovaPratica">Nova prática</button>
 
 </div>
 
@@ -34,12 +32,12 @@
     <script type="text/javascript">
 
         function editarPratica(idPratica) {
-            window.location.href = '/Admin/Pratica/EdicaoVinculoPratica?idPratica=' + idPratica;
+            window.location.href = '/Admin/Pratica/EdicaoPratica?idPratica=' + idPratica;
         }
 
-        function desvincularPratica(idPratica, idInstituicao) {
+        function excluirPratica(idPratica) {
             Swal.fire({
-                title: "Deseja prosseguir com a ação?",
+                title: "Se a prática for excluída será desvinculada de todas as instituições. Deseja prosseguir com a ação?",
                 showCancelButton: true,
                 cancelButtonText: 'Cancelar',
                 confirmButtonColor: 'LightSeaGreen',
@@ -47,16 +45,15 @@
             }).then((resultado) => {
                 if (resultado.isConfirmed) {
                     $.ajax({
-                        url: '@Url.Action("DesvincularPratica", "Pratica")',
+                        url: '@Url.Action("ExcluirPratica", "Pratica")',
                         type: 'DELETE',
                         data: {
-                            idPratica: idPratica,
-                            idInstituicao: idInstituicao
+                            idPratica: idPratica
                         },
                         success: function (resposta) {
                             if (resposta.sucesso) {
                                 Swal.fire({
-                                    title: "Prática desvinculada com sucesso!",
+                                    title: "Prática excluída com sucesso!",
                                     confirmButtonColor: 'LightSeaGreen',
                                     icon: "success"
                                 }).then((resultado) => { window.location.reload(true); });
@@ -65,7 +62,7 @@
                             }
                         },
                         error: function (xhr, status, error) {
-                            exibirAlerta('Erro ao desvincular prática.');
+                            exibirAlerta('Erro ao excluir prática.');
                         }
                     });
                 }
@@ -73,8 +70,9 @@
         }
 
         $(document).ready(function () {
-            $('#btnVincularPratica').on('click', function () {
-                window.location.href = '@Url.Action("VinculoPratica", "Pratica")';
+
+            $('#btnNovaPratica').on('click', function () {
+                window.location.href = '@Url.Action("NovaPratica", "Pratica")';
             });
         });
     </script>

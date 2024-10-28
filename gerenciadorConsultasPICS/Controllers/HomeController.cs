@@ -11,11 +11,19 @@ namespace gerenciadorConsultasPICS.Controllers
             _logger = logger;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
 
+        [HttpGet]
+        public IActionResult AcessoNegado()
+        {
+            return View();
+        }
+
+        [HttpGet]
         public IActionResult Privacy()
         {
             return View();
