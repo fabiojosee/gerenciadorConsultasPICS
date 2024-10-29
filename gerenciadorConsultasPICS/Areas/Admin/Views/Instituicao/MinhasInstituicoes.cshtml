@@ -1,0 +1,78 @@
+﻿@model List<gerenciadorConsultasPICS.Areas.Admin.Models.Instituicao>
+@{
+    ViewData["Title"] = "Minhas instituições";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container">
+
+    <h1>Minhas instituições</h1>
+
+    <div class="mt-4">
+
+        @foreach (var item in Model)
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <p class="mb-1" style="text-align: start;">@item.nome</p>
+                    <p class="mb-1" style="text-align: start;">@item.descricao</p>
+                    <button type="button" class="btn" onclick="editarInstituicao(@item.idInstituicao)">Editar instituição</button>
+                    <button type="button" class="btn-cancelar" onclick="excluirInstituicao(@item.idInstituicao)">Excluir instituição</button>
+                </div>
+            </div>
+        }
+
+    </div>
+
+    <button type="button" class="btn" id="btnNovaInstituicao">Nova instituição</button>
+
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        function editarInstituicao(idInstituicao) {
+            window.location.href = '/Admin/Instituicao/EdicaoInstituicao?idInstituicao=' + idInstituicao;
+        }
+
+        function excluirInstituicao(idInstituicao) {
+            Swal.fire({
+                title: "Deseja prosseguir com a ação?",
+                showCancelButton: true,
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: 'LightSeaGreen',
+                confirmButtonText: 'Confirmar'
+            }).then((resultado) => {
+                if (resultado.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("ExcluirInstituicao", "Instituicao")',
+                        type: 'DELETE',
+                        data: {
+                            idInstituicao: idInstituicao
+                        },
+                        success: function (resposta) {
+                            if (resposta.sucesso) {
+                                Swal.fire({
+                                    title: "Instituição excluída com sucesso!",
+                                    confirmButtonColor: 'LightSeaGreen',
+                                    icon: "success"
+                                }).then((resultado) => { window.location.reload(true); });
+                            } else {
+                                exibirAlerta(resposta.mensagem);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            exibirAlerta('Erro ao excluir instituição.');
+                        }
+                    });
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            $('#btnNovaInstituicao').on('click', function () {
+                window.location.href = '@Url.Action("NovaInstituicao", "Instituicao")';
+            });
+        });
+    </script>
+}

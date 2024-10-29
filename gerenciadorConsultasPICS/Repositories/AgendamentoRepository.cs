@@ -18,5 +18,10 @@ namespace gerenciadorConsultasPICS.Repositories
         {
             return await _context.Agendamento.Where(x => x.idPratica == idPratica && x.idInstituicao == idInstituicao).ToListAsync();
         }
+
+        public async Task<IEnumerable<Agendamento>> ObterPorInstituicao(int idInstituicao)
+        {
+            return await _context.Agendamento.Where(x => x.idInstituicao == idInstituicao).ToListAsync();
+        }
     }
 }

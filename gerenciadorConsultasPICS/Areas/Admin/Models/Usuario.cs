@@ -4,6 +4,8 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Models
 {
     public class Usuario
     {
+        protected Usuario() { }
+
         public Usuario(int idUsuario, byte idPerfil, int? idInstituicao, string login, string senha)
         {
             this.idUsuario = idUsuario;
@@ -21,5 +23,19 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Models
         public string senha { get; private set; }
 
         public void AlterarSenha(string senha) => this.senha = senha;
+
+        public static class UsuarioFactory
+        {
+            public static Usuario CriarUsuario(byte idPerfil, int? idInstituicao, string login, string senha)
+            {
+                return new Usuario()
+                {
+                    idPerfil = idPerfil,
+                    idInstituicao = idInstituicao,
+                    login = login,
+                    senha = senha
+                };
+            }
+        }
     }
 }

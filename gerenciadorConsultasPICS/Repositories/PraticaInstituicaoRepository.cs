@@ -47,6 +47,11 @@ namespace gerenciadorConsultasPICS.Repositories
             return await _context.PraticaInstituicao.Where(x => x.idPratica == idPratica).ToListAsync();
         }
 
+        public async Task<IEnumerable<PraticaInstituicao>> ObterPraticasVinculadas(int idInstituicao)
+        {
+            return await _context.PraticaInstituicao.Where(x => x.idInstituicao == idInstituicao).ToListAsync();
+        }
+
         #region Métodos auxiliares
 
         private string ConverterPeriodicidade(byte periodicidade)

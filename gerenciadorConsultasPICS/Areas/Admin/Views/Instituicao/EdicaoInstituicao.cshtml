@@ -1,0 +1,196 @@
+﻿@model gerenciadorConsultasPICS.Areas.Admin.ViewModels.Instituicao.InstituicaoViewModel
+@{
+    ViewData["Title"] = "Edição de instituição";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container container-centralizado">
+
+    <h1>Dados da instituição</h1>
+
+    <form id="formEdicaoInstituicao">
+        <input type="hidden" id="idInstituicao" name="idInstituicao" value="@Model.idInstituicao" />
+        <div class="form-group">
+            <label for="nome" class="form-label">Nome</label>
+            <input type="text" id="nome" name="nome" class="form-control" required value="@Model.nome" />
+        </div>
+        <div class="form-group">
+            <label for="email" class="form-label">E-mail</label>
+            <input type="email" id="email" name="email" class="form-control" required value="@Model.email" />
+        </div>
+        <div class="form-group">
+            <label for="cnpj" class="form-label">CNPJ</label>
+            <input type="text" id="cnpj" name="cnpj" class="form-control" required value="@Model.cnpj" oninput="aplicarMascaraCnpj(this)" maxlength="18" />
+        </div>
+        <div class="form-group">
+            <label for="descricao" class="form-label">Descrição</label>
+            <input type="text" id="descricao" name="descricao" class="form-control" value="@Model.descricao" />
+        </div>
+        <div class="form-group">
+            <label for="idEstado" class="form-label">Estado</label>
+            <select id="idEstado" name="idEstado" required class="form-select">
+                <option value="">Selecione um estado</option>
+                @foreach (var estado in ViewBag.Estados)
+                {
+                    <option value="@estado.idEstado">@estado.nome (@estado.sigla)</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="idCidade" class="form-label">Cidade</label>
+            <select id="idCidade" name="idCidade" required class="form-select">
+                <option value="">Selecione uma cidade</option>
+                @foreach (var cidade in ViewBag.Cidades)
+                {
+                    <option value="@cidade.idCidade">@cidade.nome</option>
+                }
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="cep" class="form-label">CEP</label>
+            <input type="text" id="cep" name="cep" class="form-control" required value="@Model.cep" oninput="aplicarMascaraCep(this)" maxlength="9" />
+        </div>
+        <div class="form-group row">
+            <div class="col-md-6">
+                <label for="horarioInicioAtendimento" class="control-label">Hora de Início</label>
+                <input id="horarioInicioAtendimento" name="horarioInicioAtendimento" type="time" class="form-control" required value="@Model.horarioInicioAtendimento" />
+            </div>
+            <div class="col-md-6">
+                <label for="horarioFimAtendimento" class="control-label">Hora de Fim</label>
+                <input id="horarioFimAtendimento" name="horarioFimAtendimento" type="time" class="form-control" required value="@Model.horarioFimAtendimento" />
+            </div>
+        </div>
+
+        <button type="submit" class="btn">Salvar</button>
+    </form>
+
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        function aplicarMascaraCep(input) {
+            let cep = input.value.replace(/\D/g, "");
+            if (cep.length > 5) {
+                cep = cep.replace(/^(\d{5})(\d)/, "$1-$2");
+            }
+            input.value = cep;
+        }
+
+        function aplicarMascaraCnpj(input) {
+            let cnpj = input.value.replace(/\D/g, "");
+            cnpj = cnpj.replace(/^(\d{2})(\d)/, "$1.$2");
+            cnpj = cnpj.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3");
+            cnpj = cnpj.replace(/\.(\d{3})(\d)/, ".$1/$2");
+            cnpj = cnpj.replace(/(\d{4})(\d)/, "$1-$2");
+            input.value = cnpj;
+        }
+
+        function obterCidades(idEstado) {
+            $.ajax({
+                url: '/Admin/Cidade/ObterCidades',
+                type: 'GET',
+                data: { idEstado: idEstado },
+                success: function (resposta) {
+                    if (resposta.sucesso) {
+                        $('#idCidade').empty();
+                        $('#idCidade').append('<option value="">Selecione uma cidade</option>');
+
+                        $.each(resposta.listaCidades, function (index, cidade) {
+                            $('#idCidade').append('<option value="' + cidade.idCidade + '">' + cidade.nome + '</option>');
+                        });
+                    } else {
+                        exibirAlerta(resposta.mensagem);
+                    }
+                },
+                error: function () {
+                    exibirAlerta('Erro ao carregar as cidades.');
+                }
+            });
+        }
+
+        function validarCnpj(cnpj) {
+            cnpj = cnpj.replace(/\D/g, "");
+            if (cnpj.length !== 14) return false;
+
+            let tamanho = cnpj.length - 2;
+            let numeros = cnpj.substring(0, tamanho);
+            const digitos = cnpj.substring(tamanho);
+            let soma = 0;
+            let pos = tamanho - 7;
+
+            for (let i = tamanho; i >= 1; i--) {
+                soma += numeros.charAt(tamanho - i) * pos--;
+                if (pos < 2) pos = 9;
+            }
+
+            let resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+            if (resultado !== parseInt(digitos.charAt(0))) return false;
+
+            tamanho++;
+            numeros = cnpj.substring(0, tamanho);
+            soma = 0;
+            pos = tamanho - 7;
+
+            for (let i = tamanho; i >= 1; i--) {
+                soma += numeros.charAt(tamanho - i) * pos--;
+                if (pos < 2) pos = 9;
+            }
+
+            resultado = soma % 11 < 2 ? 0 : 11 - (soma % 11);
+            if (resultado !== parseInt(digitos.charAt(1))) return false;
+
+            return true;
+        }
+
+        $(document).ready(function () {
+
+            $('#idEstado').val('@Model.idEstado').trigger('change');
+            $('#idCidade').val('@Model.idCidade').trigger('change');
+
+            const cnpjInput = document.getElementById("cnpj");
+            aplicarMascaraCnpj(cnpjInput);
+
+            const cepInput = document.getElementById("cep");
+            aplicarMascaraCep(cepInput);
+
+            $('#idEstado').change(function () {
+                var idEstado = $(this).val();
+
+                if (idEstado) {
+                    obterCidades(idEstado);
+                } else {
+                    $('#idCidade').empty();
+                    $('#idCidade').append('<option value="">Selecione uma cidade</option>');
+                }
+            });
+
+            $('#formEdicaoInstituicao').submit(function (e) {
+                e.preventDefault();
+
+                var formData = $(this).serialize();
+
+                if (!validarCnpj($('#cnpj').val())) {
+                    exibirAlerta("CNPJ inválido.");
+                    return false;
+                }
+
+                $.ajax({
+                    url: '@Url.Action("EditarInstituicao", "Instituicao")',
+                    type: 'PUT',
+                    data: formData,
+                    success: function (resposta) {
+                        if (resposta.sucesso) {
+                            window.location.href = '@Url.Action("EdicaoInstituicaoSucesso", "Instituicao")';
+                        } else {
+                            exibirAlerta(resposta.mensagem);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        exibirAlerta('Erro ao editar instituição.');
+                    }
+                });
+            });
+        });
+    </script>
+}
