@@ -17,15 +17,23 @@
             <div class="card mb-3">
                 <div class="card-body">
                     <div class="d-flex justify-content-between mb-1">
-                        <span>@item.nomePratica</span>
+                        <span>@item.nomePratica - @item.dataAtendimento.ToLongDateString()</span>
                         <span class="fw-bold status-@item.status">@item.statusAtendimento</span>
                     </div>
                     <p class="mb-1" style="text-align: start;">@item.cidadePaciente, @item.estadoPaciente</p>
-                    <p class="mb-0" style="text-align: start;">@item.dataAtendimento</p>
+                    <p class="mb-1" style="text-align: start;">Nome da instituição: @(item.nomeInstituicao) - CEP: @(item.cepInstituicao)</p>
+                    <p class="mb-0" style="text-align: start;">
+                        Horário de atendimento: @(item.horarioInicioAtendimento.Value.ToString(@"hh\:mm")) às
+                        @(item.horarioFimAtendimento.Value.ToString(@"hh\:mm")), por ordem de chegada
+                    </p>
 
                     @if (item.status == (byte)StatusAtendimento.Agendado)
                     {
                         <button type="button" class="btn-cancelar" onclick="cancelarAtendimento(@item.idAtendimento)">Cancelar atendimento</button>
+                    }
+                    @if (item.status == (byte)StatusAtendimento.Finalizado)
+                    {
+                        <button type="button" class="btn" onclick="avaliarAtendimento(@item.idAtendimento)">Avaliar atendimento</button>
                     }
                 </div>
             </div>
@@ -65,6 +73,24 @@
                             exibirAlerta('Erro ao cancelar atendimento.');
                         }
                     });
+                }
+            });
+        }
+
+        function avaliarAtendimento(idAtendimento) {
+            $.ajax({
+                url: '/Usuario/Atendimento/AvaliarAtendimento',
+                type: 'POST',
+                data: { idAtendimento: idAtendimento, link: '@ViewBag.FormularioAvaliacao' },
+                success: function (resposta) {
+                    if (resposta.sucesso) {
+                        window.open('@ViewBag.FormularioAvaliacao', '_blank');
+                    } else {
+                        exibirAlerta(resposta.mensagem);
+                    }
+                },
+                error: function () {
+                    exibirAlerta('Erro ao acessar avaliação.');
                 }
             });
         }

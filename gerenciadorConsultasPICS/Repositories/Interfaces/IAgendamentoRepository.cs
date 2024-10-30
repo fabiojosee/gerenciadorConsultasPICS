@@ -7,5 +7,6 @@ namespace gerenciadorConsultasPICS.Repositories.Interfaces
         public Task<IEnumerable<Agendamento>> ObterPorPratica(short idPratica);
         public Task<IEnumerable<Agendamento>> ObterPorPraticaInstituicao(short idPratica, int idInstituicao);
         public Task<IEnumerable<Agendamento>> ObterPorInstituicao(int idInstituicao);
+        public Task<IEnumerable<Agendamento>> ObterPorPaciente(short idPratica, string cpfPaciente, byte status);
     }
 }
