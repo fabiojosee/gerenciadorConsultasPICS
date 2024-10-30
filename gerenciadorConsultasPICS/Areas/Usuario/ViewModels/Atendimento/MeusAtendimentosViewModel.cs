@@ -9,5 +9,8 @@
         public DateTime dataAtendimento { get; set; }
         public string statusAtendimento { get; set; }
         public byte status { get; set; }
+        public string nomePaciente { get; set; }
+        public string telefonePaciente { get; set; }
+        public DateTime dataNascimentoPaciente { get; set; }
     }
 }
