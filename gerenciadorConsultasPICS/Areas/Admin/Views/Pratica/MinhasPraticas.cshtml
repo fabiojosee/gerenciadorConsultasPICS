@@ -73,6 +73,8 @@
         }
 
         $(document).ready(function () {
+            configurarBotaoVoltar('@Url.Action("AreaAdministrativaInstituicao", "Login")');
+
             $('#btnVincularPratica').on('click', function () {
                 window.location.href = '@Url.Action("VinculoPratica", "Pratica")';
             });

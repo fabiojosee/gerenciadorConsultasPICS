@@ -70,6 +70,7 @@
         }
 
         $(document).ready(function () {
+            configurarBotaoVoltar('@Url.Action("AreaAdministrativa", "Login")');
 
             $('#btnNovaPratica').on('click', function () {
                 window.location.href = '@Url.Action("NovaPratica", "Pratica")';

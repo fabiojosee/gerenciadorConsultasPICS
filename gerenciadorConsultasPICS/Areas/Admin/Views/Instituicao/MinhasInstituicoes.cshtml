@@ -70,6 +70,8 @@
         }
 
         $(document).ready(function () {
+            configurarBotaoVoltar('@Url.Action("AreaAdministrativa", "Login")');
+
             $('#btnNovaInstituicao').on('click', function () {
                 window.location.href = '@Url.Action("NovaInstituicao", "Instituicao")';
             });

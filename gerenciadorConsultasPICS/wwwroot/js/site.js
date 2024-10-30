@@ -1,8 +1,17 @@
 ﻿
+var telaAnterior = null;
+
 function voltarTela() {
-    history.go(-1);
+    if (telaAnterior == null) {
+        history.go(-1);
+    } else {
+        let telaAnteriorAux = telaAnterior;
+        telaAnterior = null;
+        window.location.href = telaAnteriorAux;
+    }
     return false;
 }
+
 function exibirAlerta(mensagem) {
     Swal.fire({
         heightAuto: false,
@@ -12,6 +21,10 @@ function exibirAlerta(mensagem) {
         confirmButtonColor: 'LightSeaGreen',
         confirmButtonText: 'OK'
     });
+}
+
+function configurarBotaoVoltar(pTelaAnterior) {
+    telaAnterior = pTelaAnterior;
 }
 
 $(document).ready(function () {

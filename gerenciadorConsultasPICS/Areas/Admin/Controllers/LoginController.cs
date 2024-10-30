@@ -64,7 +64,7 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Controllers
             return Json(new { sucesso = true, usuario.idPerfil });
         }
 
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
