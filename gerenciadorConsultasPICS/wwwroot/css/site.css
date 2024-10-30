@@ -61,7 +61,6 @@ body {
     }
 
 .btn-cancelar {
-    float: right;
     width: 200px;
     margin: 10px auto;
     padding: 15px;
@@ -100,21 +99,16 @@ h1 {
     color: red;
 }
 
-.titulo {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    padding: 10px 0;
-}
-
 .list-container {
     max-height: 100vh;
     overflow-y: auto;
+    padding-top: 1.5rem;
 }
 
 .form-container {
     max-height: 100vh;
     overflow-y: auto;
+    padding-top: 1.5rem;
 }
 
 #overlay-loading {
@@ -137,8 +131,8 @@ h1 {
 
 #btn-voltar {
     position: absolute;
-    top: 2rem;
-    left: 2rem;
+    top: 1rem;
+    left: 1rem;
     cursor: pointer;
     z-index: 999;
 }

@@ -5,10 +5,9 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@* TODO: Corrigir posição do título *@
-<h1 class="titulo">Meus atendimentos</h1>
-
 <div class="list-container">
+
+    <h1>Meus atendimentos</h1>
 
     <div class="mt-4">
 
@@ -20,7 +19,9 @@
                         <span>@item.nomePratica - @item.dataAtendimento.ToLongDateString()</span>
                         <span class="fw-bold status-@item.status">@item.statusAtendimento</span>
                     </div>
+                    <hr />
                     <p class="mb-1" style="text-align: start;">@item.cidadePaciente, @item.estadoPaciente</p>
+                    <hr />
                     <p class="mb-0" style="text-align: start;">Paciente: @(item.nomePaciente). Data de Nascimento: @(item.dataNascimentoPaciente.Value.ToShortDateString()). Telefone: <span class="telefonePaciente">@item.telefonePaciente</span></p>
 
                     @if (item.status == (byte)StatusAtendimento.Agendado)
