@@ -21,7 +21,7 @@
                         <span class="fw-bold status-@item.status">@item.statusAtendimento</span>
                     </div>
                     <p class="mb-1" style="text-align: start;">@item.cidadePaciente, @item.estadoPaciente</p>
-                    <p class="mb-0" style="text-align: start;">Paciente: @(item.nomePaciente). Data de Nascimento: @(item.dataNascimentoPaciente.ToShortDateString()). Telefone: <span class="telefonePaciente">@item.telefonePaciente</span></p>
+                    <p class="mb-0" style="text-align: start;">Paciente: @(item.nomePaciente). Data de Nascimento: @(item.dataNascimentoPaciente.Value.ToShortDateString()). Telefone: <span class="telefonePaciente">@item.telefonePaciente</span></p>
 
                     @if (item.status == (byte)StatusAtendimento.Agendado)
                     {

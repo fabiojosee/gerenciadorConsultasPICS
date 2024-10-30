@@ -22,18 +22,26 @@ namespace gerenciadorConsultasPICS.Repositories
                         on agendamento.idEstadoPaciente equals estado.idEstado
                         join cidade in _context.Cidade
                         on agendamento.idCidadePaciente equals cidade.idCidade
+                        join instituicao in _context.Instituicao
+                        on agendamento.idInstituicao equals instituicao.idInstituicao
                         where agendamento.cpfPaciente == cpfPaciente
                         orderby atendimento.dataAtendimento descending
-                        select new MeusAtendimentosViewModel
-                        {
-                            idAtendimento = atendimento.idAtendimento,
-                            nomePratica = pratica.nome,
-                            cidadePaciente = cidade.nome,
-                            estadoPaciente = estado.sigla,
-                            dataAtendimento = atendimento.dataAtendimento,
-                            statusAtendimento = ((StatusAtendimento)atendimento.status).ToString(),
-                            status = atendimento.status
-                        };
+                        select new MeusAtendimentosViewModel(
+                            atendimento.idAtendimento,
+                            pratica.nome,
+                            cidade.nome,
+                            estado.sigla,
+                            atendimento.dataAtendimento,
+                            ((StatusAtendimento)atendimento.status).ToString(),
+                            atendimento.status,
+                            agendamento.nomePaciente,
+                            agendamento.telefonePaciente,
+                            agendamento.dataNascimentoPaciente,
+                            instituicao.horarioInicioAtendimento,
+                            instituicao.horarioFimAtendimento,
+                            instituicao.nome,
+                            instituicao.cep
+                        );
 
             return await query.ToListAsync();
         }
@@ -56,19 +64,22 @@ namespace gerenciadorConsultasPICS.Repositories
                         on agendamento.idCidadePaciente equals cidade.idCidade
                         where agendamento.idInstituicao == idInstituicao
                         orderby atendimento.dataAtendimento descending
-                        select new MeusAtendimentosViewModel
-                        {
-                            idAtendimento = atendimento.idAtendimento,
-                            nomePratica = pratica.nome,
-                            cidadePaciente = cidade.nome,
-                            estadoPaciente = estado.sigla,
-                            dataAtendimento = atendimento.dataAtendimento,
-                            statusAtendimento = ((StatusAtendimento)atendimento.status).ToString(),
-                            status = atendimento.status,
-                            nomePaciente = agendamento.nomePaciente,
-                            telefonePaciente = agendamento.telefonePaciente,
-                            dataNascimentoPaciente = agendamento.dataNascimentoPaciente
-                        };
+                        select new MeusAtendimentosViewModel(
+                            atendimento.idAtendimento,
+                            pratica.nome,
+                            cidade.nome,
+                            estado.sigla,
+                            atendimento.dataAtendimento,
+                            ((StatusAtendimento)atendimento.status).ToString(),
+                            atendimento.status,
+                            agendamento.nomePaciente,
+                            agendamento.telefonePaciente,
+                            agendamento.dataNascimentoPaciente,
+                            null,
+                            null,
+                            null,
+                            null
+                        );
 
             return await query.ToListAsync();
         }

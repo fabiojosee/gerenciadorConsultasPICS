@@ -1,4 +1,5 @@
-﻿using gerenciadorConsultasPICS.Areas.Usuario.Models;
+﻿using gerenciadorConsultasPICS.Areas.Admin.Enums;
+using gerenciadorConsultasPICS.Areas.Usuario.Models;
 using gerenciadorConsultasPICS.Areas.Usuario.ViewModels.Agendamento;
 using gerenciadorConsultasPICS.Helpers;
 using gerenciadorConsultasPICS.Repositories.Interfaces;
@@ -183,7 +184,6 @@ namespace gerenciadorConsultasPICS.Areas.Usuario.Controllers
             if (novoAgendamentoViewModel.grauAnsiedadePaciente is null)
                 return Json(new { sucesso = false, mensagem = "Preencha o campo Grau de ansiedade." });
 
-
             #region Criação agendamento
 
             short idEstadoPaciente = Convert.ToInt16(TempData["NovoAgendamento_idEstadoPaciente"]);
@@ -192,6 +192,10 @@ namespace gerenciadorConsultasPICS.Areas.Usuario.Controllers
             short idPratica = Convert.ToInt16(TempData["NovoAgendamento_idPratica"]);
             DateTime dataInicio = Convert.ToDateTime(TempData["NovoAgendamento_dataInicio"]);
             TempData.Keep();
+
+            var agendamentos = await _agendamentoRepository.ObterPorPaciente(idPratica, novoAgendamentoViewModel.cpfPaciente, (byte)StatusAgendamento.EmAndamento);
+            if (agendamentos.Any())
+                return Json(new { sucesso = false, mensagem = "Você já possui um agendamento em andamento para a prática selecionada." });
 
             Agendamento novoAgendamento = Agendamento.AgendamentoFactory.CriarAgendamento(
                 idInstituicao,
@@ -245,15 +249,17 @@ namespace gerenciadorConsultasPICS.Areas.Usuario.Controllers
 
             #region Enviar notificação
 
-            List<string> listaDatasAgendadas = new List<string>();
+            List<string> linhasMensagem = new List<string>();
 
             foreach (var dataAgendada in datasAgendadas)
             {
-                listaDatasAgendadas.Add(dataAgendada.ToShortDateString());
+                linhasMensagem.Add(dataAgendada.ToShortDateString());
             }
+            var instituicao = await _instituicaoRepository.ObterPorIdAsync(idInstituicao);
+            linhasMensagem.Add($"<br>Nome da instituição: {instituicao.nome} - CEP: {FormatarCep(instituicao.cep)}.");
+            linhasMensagem.Add($"O atendimento é realizado por ordem de chegada, das {instituicao.horarioInicioAtendimento.ToString(@"hh\:mm")} às {instituicao.horarioFimAtendimento.ToString(@"hh\:mm")}.");
 
-            // TODO: Adicionar informações do local/instituição, horário de atendimento e que funcionamento é por chegada
-            var mensagem = EmailHelper.GerarTemplateEmail("Você possui novos atendimentos agendados para as seguintes datas:", listaDatasAgendadas);
+            var mensagem = EmailHelper.GerarTemplateEmail("Você possui novos atendimentos agendados para as seguintes datas:", linhasMensagem);
 
             await _emailService.EnviarEmailAsync(novoAgendamentoViewModel.emailPaciente, "Agendamento realizado com sucesso!", mensagem);
 
@@ -266,5 +272,18 @@ namespace gerenciadorConsultasPICS.Areas.Usuario.Controllers
         {
             return View();
         }
+
+        #region Métodos auxiliares
+
+        private string FormatarCep(string cep)
+        {
+            cep = new string(cep.Where(char.IsDigit).ToArray());
+            if (cep.Length == 8)
+                return $"{cep.Substring(0, 5)}-{cep.Substring(5, 3)}";
+
+            return cep;
+        }
+
+        #endregion
     }
 }
