@@ -18,6 +18,7 @@ namespace gerenciadorConsultasPICS.Areas.Usuario.Controllers
         private readonly IInstituicaoRepository _instituicaoRepository;
         private readonly IEstadoRepository _estadoRepository;
         private readonly IPraticaInstituicaoRepository _praticaInstituicaoRepository;
+        private readonly ITermoConsentimentoRepository _termoConsentimentoRepository;
         private readonly IEmailService _emailService;
 
         public AgendamentoController(
@@ -27,6 +28,7 @@ namespace gerenciadorConsultasPICS.Areas.Usuario.Controllers
             IInstituicaoRepository instituicaoRepository,
             IEstadoRepository estadoRepository,
             IPraticaInstituicaoRepository praticaInstituicaoRepository,
+            ITermoConsentimentoRepository termoConsentimentoRepository,
             IEmailService emailService)
         {
             _logger = logger;
@@ -35,6 +37,7 @@ namespace gerenciadorConsultasPICS.Areas.Usuario.Controllers
             _instituicaoRepository = instituicaoRepository;
             _estadoRepository = estadoRepository;
             _praticaInstituicaoRepository = praticaInstituicaoRepository;
+            _termoConsentimentoRepository = termoConsentimentoRepository;
             _emailService = emailService;
         }
 
@@ -212,6 +215,13 @@ namespace gerenciadorConsultasPICS.Areas.Usuario.Controllers
             );
 
             await _agendamentoRepository.AdicionarAsync(novoAgendamento);
+
+            #endregion
+
+            #region Criação termo de consentimento
+
+            var termoConsentimento = TermoConsentimento.TermoConsentimentoFactory.CriarTermoConsentimento(novoAgendamento.idAgendamento, DateTime.Now);
+            await _termoConsentimentoRepository.AdicionarAsync(termoConsentimento);
 
             #endregion
 

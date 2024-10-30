@@ -18,6 +18,8 @@ namespace gerenciadorConsultasPICS.Data
         public DbSet<Estado> Estado { get; set; }
         public DbSet<PraticaInstituicao> PraticaInstituicao { get; set; }
         public DbSet<Usuario> Usuario { get; set; }
+        public DbSet<Avaliacao> Avaliacao { get; set; }
+        public DbSet<TermoConsentimento> TermoConsentimento { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

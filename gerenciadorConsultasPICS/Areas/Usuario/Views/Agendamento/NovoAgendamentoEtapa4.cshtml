@@ -77,6 +77,38 @@
             input.value = telefone;
         }
 
+        function validarCPF(cpf) {
+            cpf = cpf.replace(/[^\d]+/g, '');
+
+            if (cpf.length !== 11 || /^(\d)\1+$/.test(cpf)) {
+                return false;
+            }
+
+            let soma = 0;
+            let resto;
+
+            for (let i = 1; i <= 9; i++) {
+                soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+            }
+
+            resto = (soma * 10) % 11;
+
+            if (resto === 10 || resto === 11) resto = 0;
+            if (resto !== parseInt(cpf.substring(9, 10))) return false;
+
+            soma = 0;
+            for (let i = 1; i <= 10; i++) {
+                soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+            }
+
+            resto = (soma * 10) % 11;
+
+            if (resto === 10 || resto === 11) resto = 0;
+            if (resto !== parseInt(cpf.substring(10, 11))) return false;
+
+            return true;
+        }
+
         $(document).ready(function () {
 
             $("#dataNascimentoPaciente").datepicker({
@@ -95,23 +127,39 @@
             $('#formEtapa4').submit(function (e) {
                 e.preventDefault();
 
-                // TODO: Implementar validação de CPF
+                if (!validarCPF($('#cpfPaciente').val())) {
+                    exibirAlerta('CPF inválido!');
+                    return false;
+                }
 
-                $.ajax({
-                    url: '@Url.Action("NovoAgendamentoEtapa4", "Agendamento")',
-                    type: 'POST',
-                    data: $(this).serialize(),
-                    success: function (resposta) {
-                        if (resposta.sucesso) {
-                            window.location.href = '@Url.Action("Sucesso", "Agendamento")';
-                        } else {
-                            exibirAlerta(resposta.mensagem);
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        exibirAlerta('Erro ao finalizar etapa.');
+                Swal.fire({
+                    title: "Consentimento para Uso de Informações Pessoais",
+                    icon: "info",
+                    html: "Para realizar seu agendamento, precisamos coletar e utilizar algumas informações pessoais. Essas informações serão usadas exclusivamente para fins de agendamento, comunicação e prestação de serviços.<br>Ao prosseguir, você confirma que leu e concorda com o uso de seus dados pessoais para esses fins específicos.<br>Deseja continuar?",
+                    showCancelButton: true,
+                    cancelButtonText: 'Não aceito',
+                    confirmButtonColor: 'LightSeaGreen',
+                    confirmButtonText: 'Aceito'
+                }).then((resultado) => {
+                    if (resultado.isConfirmed) {
+                        $.ajax({
+                            url: '@Url.Action("NovoAgendamentoEtapa4", "Agendamento")',
+                            type: 'POST',
+                            data: $(this).serialize(),
+                            success: function (resposta) {
+                                if (resposta.sucesso) {
+                                    window.location.href = '@Url.Action("Sucesso", "Agendamento")';
+                                } else {
+                                    exibirAlerta(resposta.mensagem);
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                exibirAlerta('Erro ao finalizar etapa.');
+                            }
+                        });
                     }
                 });
+
             });
         });
     </script>

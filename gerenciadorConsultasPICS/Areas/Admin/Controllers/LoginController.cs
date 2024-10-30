@@ -16,22 +16,26 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Controllers
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IInstituicaoRepository _instituicaoRepository;
         private readonly IEmailService _emailService;
+        private readonly IConfiguration _configuration;
 
         public LoginController(
             ILogger<LoginController> logger,
             IUsuarioRepository usuarioRepository,
             IInstituicaoRepository instituicaoRepository,
-            IEmailService emailService)
+            IEmailService emailService,
+            IConfiguration configuration)
         {
             _logger = logger;
             _usuarioRepository = usuarioRepository;
             _instituicaoRepository = instituicaoRepository;
             _emailService = emailService;
+            _configuration = configuration;
         }
 
         [HttpGet]
         public IActionResult Login()
         {
+            ViewBag.FormularioNovaInstituicao = _configuration["Formularios:NovaInstituicao"];
             return View();
         }
 
@@ -140,6 +144,7 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Controllers
         [Authorize(Policy = "ApenasInstituicao")]
         public IActionResult AreaAdministrativaInstituicao()
         {
+            ViewBag.FormularioNovaPratica = _configuration["Formularios:NovaPratica"];
             return View();
         }
     }

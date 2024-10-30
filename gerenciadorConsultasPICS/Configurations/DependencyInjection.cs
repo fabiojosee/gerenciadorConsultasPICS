@@ -20,6 +20,8 @@ namespace gerenciadorConsultasPICS.Configurations
             services.AddScoped<IPraticaRepository, PraticaRepository>();
             services.AddScoped<IPraticaInstituicaoRepository, PraticaInstituicaoRepository>();
             services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+            services.AddScoped<IAvaliacaoRepository, AvaliacaoRepository>();
+            services.AddScoped<ITermoConsentimentoRepository, TermoConsentimentoRepository>();
 
             #endregion
 

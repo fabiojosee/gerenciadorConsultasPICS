@@ -26,6 +26,7 @@
                     @if (item.status == (byte)StatusAtendimento.Agendado)
                     {
                         <button type="button" class="btn-cancelar" onclick="cancelarAtendimento(@item.idAtendimento)">Cancelar atendimento</button>
+                        <button type="button" class="btn" onclick="finalizarAtendimento(@item.idAtendimento)">Finalizar atendimento</button>
                     }
                 </div>
             </div>
@@ -73,6 +74,38 @@
                         },
                         error: function () {
                             exibirAlerta('Erro ao cancelar atendimento.');
+                        }
+                    });
+                }
+            });
+        }
+
+        function finalizarAtendimento(idAtendimento) {
+            Swal.fire({
+                title: "Deseja prosseguir com a ação?",
+                showCancelButton: true,
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: 'LightSeaGreen',
+                confirmButtonText: 'Confirmar'
+            }).then((resultado) => {
+                if (resultado.isConfirmed) {
+                    $.ajax({
+                        url: '/Usuario/Atendimento/FinalizarAtendimento',
+                        type: 'PUT',
+                        data: { idAtendimento: idAtendimento },
+                        success: function (resposta) {
+                            if (resposta.sucesso) {
+                                Swal.fire({
+                                    title: "Atendimento finalizado com sucesso!",
+                                    confirmButtonColor: 'LightSeaGreen',
+                                    icon: "success"
+                                }).then((resultado) => { window.location.reload(true); });
+                            } else {
+                                exibirAlerta(resposta.mensagem);
+                            }
+                        },
+                        error: function () {
+                            exibirAlerta('Erro ao finalizar atendimento.');
                         }
                     });
                 }
