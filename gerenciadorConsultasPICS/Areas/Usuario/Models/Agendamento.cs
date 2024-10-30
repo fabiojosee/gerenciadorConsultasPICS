@@ -7,7 +7,7 @@ namespace gerenciadorConsultasPICS.Areas.Usuario.Models
     {
         protected Agendamento() { }
 
-        public Agendamento(int idAgendamento, int idInstituicao, short idPratica, DateTime dataCriacao, byte status, string? observacao, string nomePaciente, string cpfPaciente, string telefonePaciente, DateTime dataNascimentoPaciente, byte generoPaciente, string emailPaciente, Int16 idEstadoPaciente, int idCidadePaciente, byte grauAnsiedadePaciente)
+        public Agendamento(int idAgendamento, int idInstituicao, short idPratica, DateTime dataCriacao, byte status, string? observacao, string nomePaciente, string cpfPaciente, string telefonePaciente, DateTime dataNascimentoPaciente, byte generoPaciente, string emailPaciente, short idEstadoPaciente, int idCidadePaciente, byte grauAnsiedadePaciente)
         {
             this.idAgendamento = idAgendamento;
             this.idInstituicao = idInstituicao;
@@ -29,7 +29,7 @@ namespace gerenciadorConsultasPICS.Areas.Usuario.Models
         [Key]
         public int idAgendamento { get; private set; }
         public int idInstituicao { get; private set; }
-        public Int16 idPratica { get; private set; }
+        public short idPratica { get; private set; }
         public DateTime dataCriacao { get; private set; }
         public byte status { get; private set; }
         public string? observacao { get; private set; }
@@ -39,7 +39,7 @@ namespace gerenciadorConsultasPICS.Areas.Usuario.Models
         public DateTime dataNascimentoPaciente { get; private set; }
         public byte generoPaciente { get; private set; }
         public string emailPaciente { get; private set; }
-        public Int16 idEstadoPaciente { get; private set; }
+        public short idEstadoPaciente { get; private set; }
         public int idCidadePaciente { get; private set; }
         public byte grauAnsiedadePaciente { get; private set; }
 

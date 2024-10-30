@@ -7,5 +7,6 @@ namespace gerenciadorConsultasPICS.Repositories.Interfaces
     {
         public Task<IEnumerable<MeusAtendimentosViewModel>> ObterPorCpfPaciente(string cpfPaciente);
         public Task<IEnumerable<Atendimento>> ObterPorAgendamento(int idAgendamento);
+        public Task<IEnumerable<MeusAtendimentosViewModel>> ObterPorInstituicao(int idInstituicao);
     }
 }

@@ -1,5 +1,7 @@
 ﻿using gerenciadorConsultasPICS.Areas.Admin.Enums;
 using gerenciadorConsultasPICS.Repositories.Interfaces;
+using gerenciadorConsultasPICS.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
 
@@ -11,15 +13,18 @@ namespace gerenciadorConsultasPICS.Areas.Usuario.Controllers
         private readonly ILogger<AgendamentoController> _logger;
         private readonly IAtendimentoRepository _atendimentoRepository;
         private readonly IAgendamentoRepository _agendamentoRepository;
+        private readonly ITokenService _tokenService;
 
         public AtendimentoController(
             ILogger<AgendamentoController> logger,
             IAtendimentoRepository atendimentoRepository,
-            IAgendamentoRepository agendamentoRepository)
+            IAgendamentoRepository agendamentoRepository,
+            ITokenService tokenService)
         {
             _logger = logger;
             _atendimentoRepository = atendimentoRepository;
             _agendamentoRepository = agendamentoRepository;
+            _tokenService = tokenService;
         }
 
         [HttpGet]
@@ -54,6 +59,17 @@ namespace gerenciadorConsultasPICS.Areas.Usuario.Controllers
             await _agendamentoRepository.AtualizarAsync(agendamento);
 
             return Json(new { sucesso = true });
+        }
+
+        [HttpGet]
+        [Authorize(Policy = "ApenasInstituicao")]
+        public async Task<IActionResult> MeusAtendimentosInstituicao()
+        {
+            var usuarioInfo = _tokenService.ObterInformacoesToken();
+
+            var atendimentos = await _atendimentoRepository.ObterPorInstituicao(usuarioInfo.idInstituicao.Value);
+
+            return View(atendimentos);
         }
     }
 }
