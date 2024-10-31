@@ -6,13 +6,14 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Models
     {
         protected Usuario() { }
 
-        public Usuario(int idUsuario, byte idPerfil, int? idInstituicao, string login, string senha)
+        public Usuario(int idUsuario, byte idPerfil, int? idInstituicao, string login, string senha, bool flPrimeiroAcesso)
         {
             this.idUsuario = idUsuario;
             this.idPerfil = idPerfil;
             this.idInstituicao = idInstituicao;
             this.login = login;
             this.senha = senha;
+            this.flPrimeiroAcesso = flPrimeiroAcesso;
         }
 
         [Key]
@@ -21,8 +22,10 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Models
         public int? idInstituicao { get; private set; }
         public string login { get; private set; }
         public string senha { get; private set; }
+        public bool flPrimeiroAcesso { get; private set; }
 
         public void AlterarSenha(string senha) => this.senha = senha;
+        public void AlterarFlagPrimeiroAcesso(bool flPrimeiroAcesso) => this.flPrimeiroAcesso = flPrimeiroAcesso;
 
         public static class UsuarioFactory
         {
@@ -33,7 +36,8 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Models
                     idPerfil = idPerfil,
                     idInstituicao = idInstituicao,
                     login = login,
-                    senha = senha
+                    senha = senha,
+                    flPrimeiroAcesso = true
                 };
             }
         }

@@ -11,6 +11,11 @@
 
     <div class="mt-4">
 
+        @if (Model.Count == 0)
+        {
+            <p>A instituição não possui atendimentos agendados.</p>
+        }
+
         @foreach (var item in Model)
         {
             <div class="card mb-3">

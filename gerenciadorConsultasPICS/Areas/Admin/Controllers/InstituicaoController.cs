@@ -3,7 +3,6 @@ using gerenciadorConsultasPICS.Areas.Admin.Models;
 using gerenciadorConsultasPICS.Areas.Admin.ViewModels.Instituicao;
 using gerenciadorConsultasPICS.Helpers;
 using gerenciadorConsultasPICS.Repositories.Interfaces;
-using gerenciadorConsultasPICS.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.RegularExpressions;
@@ -20,7 +19,6 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Controllers
         private readonly IEstadoRepository _estadoRepository;
         private readonly ICidadeRepository _cidadeRepository;
         private readonly IUsuarioRepository _usuarioRepository;
-        private readonly ITokenService _tokenService;
 
         public InstituicaoController(
             ILogger<InstituicaoController> logger,
@@ -29,8 +27,7 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Controllers
             IAgendamentoRepository agendamentoRepository,
             IEstadoRepository estadoRepository,
             ICidadeRepository cidadeRepository,
-            IUsuarioRepository usuarioRepository,
-            ITokenService tokenService)
+            IUsuarioRepository usuarioRepository)
         {
             _logger = logger;
             _praticaInstituicaoRepository = praticaInstituicaoRepository;
@@ -39,7 +36,6 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Controllers
             _estadoRepository = estadoRepository;
             _cidadeRepository = cidadeRepository;
             _usuarioRepository = usuarioRepository;
-            _tokenService = tokenService;
         }
 
         [HttpGet]
