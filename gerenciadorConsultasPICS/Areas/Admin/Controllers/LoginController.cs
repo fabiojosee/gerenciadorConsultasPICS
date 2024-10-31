@@ -16,6 +16,7 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Controllers
         private readonly IUsuarioRepository _usuarioRepository;
         private readonly IInstituicaoRepository _instituicaoRepository;
         private readonly IEmailService _emailService;
+        private readonly ITokenService _tokenService;
         private readonly IConfiguration _configuration;
 
         public LoginController(
@@ -23,12 +24,14 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Controllers
             IUsuarioRepository usuarioRepository,
             IInstituicaoRepository instituicaoRepository,
             IEmailService emailService,
+            ITokenService tokenService,
             IConfiguration configuration)
         {
             _logger = logger;
             _usuarioRepository = usuarioRepository;
             _instituicaoRepository = instituicaoRepository;
             _emailService = emailService;
+            _tokenService = tokenService;
             _configuration = configuration;
         }
 
@@ -64,7 +67,7 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Controllers
             return Json(new { sucesso = true, usuario.idPerfil });
         }
 
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -142,10 +145,45 @@ namespace gerenciadorConsultasPICS.Areas.Admin.Controllers
 
         [HttpGet]
         [Authorize(Policy = "ApenasInstituicao")]
-        public IActionResult AreaAdministrativaInstituicao()
+        public async Task<IActionResult> AreaAdministrativaInstituicao()
         {
-            ViewBag.FormularioNovaPratica = _configuration["Formularios:NovaPratica"];
+            var usuarioInfo = _tokenService.ObterInformacoesToken();
+
+            var usuario = await _usuarioRepository.ObterPorLogin(usuarioInfo.login);
+            if (usuario is not null && usuario.flPrimeiroAcesso)
+            {
+                return RedirectToAction("AlteracaoSenha");
+            }
+            else
+            {
+                ViewBag.FormularioNovaPratica = _configuration["Formularios:NovaPratica"];
+                return View();
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Policy = "ApenasInstituicao")]
+        public IActionResult AlteracaoSenha()
+        {
             return View();
+        }
+
+        [HttpPut]
+        [Authorize(Policy = "ApenasInstituicao")]
+        public async Task<IActionResult> AlterarSenhaPrimeiroAcesso(string senha, string confirmacaoSenha)
+        {
+            if (senha != confirmacaoSenha)
+                return Json(new { sucesso = false, mensagem = "As senhas são divergentes." });
+
+            var usuarioInfo = _tokenService.ObterInformacoesToken();
+            var usuario = await _usuarioRepository.ObterPorLogin(usuarioInfo.login);
+
+            usuario.AlterarSenha(HashHelper.Criptografar(senha));
+            usuario.AlterarFlagPrimeiroAcesso(false);
+
+            await _usuarioRepository.AtualizarAsync(usuario);
+
+            return Json(new { sucesso = true });
         }
     }
 }
