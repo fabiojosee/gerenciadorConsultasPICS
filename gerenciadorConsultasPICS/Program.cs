@@ -3,6 +3,7 @@ using gerenciadorConsultasPICS.Data;
 using gerenciadorConsultasPICS.Utils;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,10 @@ var configuration = new ConfigurationBuilder()
     .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
     .Build();
 
+var culture = "pt-BR";
+var cultureInfo = new CultureInfo(culture);
+CultureInfo.CurrentCulture = cultureInfo;
+CultureInfo.CurrentUICulture = cultureInfo;
 
 #region cors
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";

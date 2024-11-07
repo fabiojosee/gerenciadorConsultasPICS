@@ -80,6 +80,7 @@ namespace gerenciadorConsultasPICS.Areas.Usuario.Controllers
         public async Task<IActionResult> NovoAgendamentoEtapa2()
         {
             short idEstadoPaciente = Convert.ToInt16(TempData["NovoAgendamento_idEstadoPaciente"]);
+            int idCidadePaciente = Convert.ToInt32(TempData["NovoAgendamento_idCidadePaciente"]);
             ViewBag.Instituicoes = await _instituicaoRepository.ObterPorEstado(idEstadoPaciente);
 
             Etapa2ViewModel etapaAtual = new Etapa2ViewModel()
@@ -88,6 +89,9 @@ namespace gerenciadorConsultasPICS.Areas.Usuario.Controllers
                 idPratica = TempData["NovoAgendamento_idPratica"] is null ? null : Convert.ToInt16(TempData["NovoAgendamento_idPratica"])
             };
             TempData.Keep();
+
+            if (idEstadoPaciente == 0 || idCidadePaciente == 0)
+                return RedirectToAction("NovoAgendamentoEtapa1");
 
             return View(etapaAtual);
         }
@@ -123,6 +127,9 @@ namespace gerenciadorConsultasPICS.Areas.Usuario.Controllers
             short idPratica = Convert.ToInt16(TempData["NovoAgendamento_idPratica"]);
             TempData.Keep();
 
+            if (idInstituicao == 0 || idPratica == 0)
+                return RedirectToAction("NovoAgendamentoEtapa2");
+
             var praticaInstituicao = await _praticaInstituicaoRepository.ObterPorPraticaInstituicao(idInstituicao, idPratica);
             ViewBag.DiaPermitidoParaAgendamento = praticaInstituicao.diaPermitidoParaAgendamento;
 
@@ -147,7 +154,15 @@ namespace gerenciadorConsultasPICS.Areas.Usuario.Controllers
         [HttpGet]
         public IActionResult NovoAgendamentoEtapa4()
         {
+            short idEstadoPaciente = Convert.ToInt16(TempData["NovoAgendamento_idEstadoPaciente"]);
+            int idCidadePaciente = Convert.ToInt32(TempData["NovoAgendamento_idCidadePaciente"]);
+            int idInstituicao = Convert.ToInt32(TempData["NovoAgendamento_idInstituicao"]);
+            short idPratica = Convert.ToInt16(TempData["NovoAgendamento_idPratica"]);
+            DateTime? dataInicio = Convert.ToDateTime(TempData["NovoAgendamento_dataInicio"]);
             TempData.Keep();
+            if (idEstadoPaciente == 0 || idCidadePaciente == 0 || idInstituicao == 0 || idPratica == 0 || dataInicio is null)
+                return RedirectToAction("NovoAgendamentoEtapa3");
+
             return View();
         }
 
