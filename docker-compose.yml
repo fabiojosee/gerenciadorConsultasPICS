@@ -1,0 +1,41 @@
+
+volumes:
+  agendapics-volume:
+
+networks:
+  frontend:
+  backend:
+ 
+services:
+  gerenciadorconsultaspics:
+    image: ${DOCKER_REGISTRY-}gerenciadorconsultaspics
+    container_name: agendapicsapi
+    build:
+      context: .
+      dockerfile: gerenciadorConsultasPICS/Dockerfile
+    networks:
+     - backend
+     - frontend
+    depends_on:
+    - database
+    ports:
+    - "32033:80"
+    environment:
+    - ASPNETCORE_ENVIRONMENT=Development
+    
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: dbagendapics
+    hostname: dbagendapics
+    volumes:
+     - agendapics-volume:/var/opt/mssql
+    networks:
+     - backend
+    ports:
+     - "1433:1433"
+    expose:
+     - 1433
+    environment:
+      SA_PASSWORD: "PASSWORD"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
