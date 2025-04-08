@@ -1,9 +1,11 @@
 ﻿using gerenciadorConsultasPICS.Services.Interfaces;
 using gerenciadorConsultasPICS.Utils;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Util.Store;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.Extensions.Options;
-using System.Net;
-using System.Net.Mail;
-using System.Text;
+using MimeKit;
 
 namespace gerenciadorConsultasPICS.Services
 {
@@ -18,26 +20,45 @@ namespace gerenciadorConsultasPICS.Services
 
         public async Task EnviarEmailAsync(string destinatario, string assunto, string mensagem)
         {
-            var client = new SmtpClient(_smtpSettings.Host, _smtpSettings.Port)
+            try
             {
-                Credentials = new NetworkCredential(_smtpSettings.UserName, _smtpSettings.Password),
-                EnableSsl = true,
-                UseDefaultCredentials = false,
-                DeliveryMethod = SmtpDeliveryMethod.Network
-            };
+                var token = await ObterTokenAcesso();
 
-            var mailMessage = new MailMessage
+                var message = new MimeMessage();
+                message.From.Add(new MailboxAddress(_smtpSettings.SenderName, _smtpSettings.SenderEmail));
+                message.To.Add(new MailboxAddress("", destinatario));
+                message.Subject = assunto;
+                message.Body = new TextPart("html") { Text = mensagem };
+
+                using var client = new SmtpClient();
+                await client.ConnectAsync(_smtpSettings.Host, _smtpSettings.Port, SecureSocketOptions.StartTls);
+                await client.AuthenticateAsync(new SaslMechanismOAuth2(_smtpSettings.SenderEmail, token));
+                await client.SendAsync(message);
+                await client.DisconnectAsync(true);
+            }
+            catch (Exception ex)
             {
-                From = new MailAddress(_smtpSettings.SenderEmail, _smtpSettings.SenderName),
-                Subject = assunto,
-                Body = mensagem,
-                IsBodyHtml = true,
-                BodyEncoding = Encoding.UTF8
-            };
+                Console.WriteLine($"Erro ao enviar e-mail: {ex.Message}");
+            }
+        }
 
-            mailMessage.To.Add(destinatario);
+        /// <summary>
+        /// É necessário adicionar o arquivo 'credenciais.json', obtido no Google Cloud, à raiz do projeto.
+        /// Observação: Caso o aplicativo não esteja publicado em produção no Google, será solicitado o login de um usuário de teste via navegador.
+        /// </summary>
+        /// <returns></returns>
+        private async Task<string> ObterTokenAcesso()
+        {
+            using var stream = new FileStream("credenciais.json", FileMode.Open, FileAccess.Read);
+            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
+                GoogleClientSecrets.FromStream(stream).Secrets,
+                new[] { "https://mail.google.com/" },
+                _smtpSettings.SenderEmail,
+                CancellationToken.None,
+                new FileDataStore("token.json", true)
+            );
 
-            await client.SendMailAsync(mailMessage);
+            return credential.Token.AccessToken;
         }
     }
 }
