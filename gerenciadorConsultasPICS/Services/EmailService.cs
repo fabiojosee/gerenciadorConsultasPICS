@@ -1,11 +1,9 @@
 ﻿using gerenciadorConsultasPICS.Services.Interfaces;
 using gerenciadorConsultasPICS.Utils;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Util.Store;
-using MailKit.Net.Smtp;
-using MailKit.Security;
+using Mailjet.Client;
+using Mailjet.Client.Resources;
 using Microsoft.Extensions.Options;
-using MimeKit;
+using Newtonsoft.Json.Linq;
 
 namespace gerenciadorConsultasPICS.Services
 {
@@ -20,45 +18,33 @@ namespace gerenciadorConsultasPICS.Services
 
         public async Task EnviarEmailAsync(string destinatario, string assunto, string mensagem)
         {
-            try
+            MailjetClient client = new(_smtpSettings.ApiKey, _smtpSettings.ApiSecret);
+
+            MailjetRequest request = new MailjetRequest
             {
-                var token = await ObterTokenAcesso();
-
-                var message = new MimeMessage();
-                message.From.Add(new MailboxAddress(_smtpSettings.SenderName, _smtpSettings.SenderEmail));
-                message.To.Add(new MailboxAddress("", destinatario));
-                message.Subject = assunto;
-                message.Body = new TextPart("html") { Text = mensagem };
-
-                using var client = new SmtpClient();
-                await client.ConnectAsync(_smtpSettings.Host, _smtpSettings.Port, SecureSocketOptions.StartTls);
-                await client.AuthenticateAsync(new SaslMechanismOAuth2(_smtpSettings.SenderEmail, token));
-                await client.SendAsync(message);
-                await client.DisconnectAsync(true);
+                Resource = SendV31.Resource,
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Erro ao enviar e-mail: {ex.Message}");
-            }
-        }
+            .Property(Send.Messages, new JArray {
+                new JObject {
+                    {"From", new JObject {
+                        {"Email", _smtpSettings.SenderEmail},
+                        {"Name", _smtpSettings.SenderName}
+                    }},
+                    {"To", new JArray {
+                        new JObject {
+                            {"Email", destinatario}
+                        }
+                    }},
+                    {"Subject", assunto},
+                    {"HTMLPart", mensagem}
+                }
+            });
 
-        /// <summary>
-        /// É necessário adicionar o arquivo 'credenciais.json', obtido no Google Cloud, à raiz do projeto.
-        /// Observação: Caso o aplicativo não esteja publicado em produção no Google, será solicitado o login de um usuário de teste via navegador.
-        /// </summary>
-        /// <returns></returns>
-        private async Task<string> ObterTokenAcesso()
-        {
-            using var stream = new FileStream("credenciais.json", FileMode.Open, FileAccess.Read);
-            var credential = await GoogleWebAuthorizationBroker.AuthorizeAsync(
-                GoogleClientSecrets.FromStream(stream).Secrets,
-                new[] { "https://mail.google.com/" },
-                _smtpSettings.SenderEmail,
-                CancellationToken.None,
-                new FileDataStore("token.json", true)
-            );
-
-            return credential.Token.AccessToken;
+            MailjetResponse response = await client.PostAsync(request);
+            if (response.IsSuccessStatusCode)
+                Console.WriteLine("E-mail enviado com sucesso!");
+            else
+                Console.WriteLine($"Erro ao enviar e-mail: {response.StatusCode}\n{response.GetErrorMessage()}");
         }
     }
 }
