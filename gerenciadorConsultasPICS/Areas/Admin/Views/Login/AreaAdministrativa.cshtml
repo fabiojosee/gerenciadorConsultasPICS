@@ -1,14 +1,36 @@
-﻿@{
-    ViewData["Title"] = "Área administrativa";
+@{
+    ViewData["Title"] = "Área Administrativa";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-    
-<div class="container container-centralizado">
 
-    <a class="btn" href="/Admin/Instituicao/MinhasInstituicoes">Gerenciar instituições</a>
-    <a class="btn" href="/Admin/Pratica/MinhasPraticasAdmin">Gerenciar práticas</a>
-    <a class="btn" href="/Admin/Pratica/VinculoPraticaAdmin">Vincular práticas</a>
+<div class="form-container container-centralizado animate-fade-in">
+    <h1>Painel Administrativo</h1>
+    <p class="text-muted mb-4">Gerencie instituições, práticas e vínculos do sistema</p>
 
+    <div class="btn-group">
+        <a class="btn btn--lg" href="/Admin/Instituicao/MinhasInstituicoes">
+            <svg class="icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            Gerenciar Instituições
+        </a>
+
+        <a class="btn btn--lg" href="/Admin/Pratica/MinhasPraticasAdmin">
+            <svg class="icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            Gerenciar Práticas
+        </a>
+
+        <a class="btn btn--outline btn--lg" href="/Admin/Pratica/VinculoPraticaAdmin">
+            <svg class="icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+            Vincular Práticas
+        </a>
+    </div>
 </div>
 
 @section Scripts {
