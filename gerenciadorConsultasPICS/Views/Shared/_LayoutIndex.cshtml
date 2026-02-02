@@ -1,30 +1,49 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"]</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <meta name="description" content="Agenda PICS - Sistema de Agendamento de Práticas Integrativas e Complementares em Saúde" />
+    <meta name="theme-color" content="#4CAF50" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <title>@ViewData["Title"] - Agenda PICS</title>
+
+    <!-- Preconnect para recursos externos -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
+
+    <!-- Estilos -->
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/gerenciadorConsultasPICS.styles.css" asp-append-version="true" />
-    @RenderSection("Styles", required: false)
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 
 <body>
+    <!-- Skip Link para Acessibilidade -->
+    <a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
 
-    <div id="overlay-loading" style="display:none;">
+    <!-- Overlay de Loading -->
+    <div id="overlay-loading" style="display:none;" role="alert" aria-live="assertive" aria-label="Carregando">
         <div id="loading">
-            <img src="~/images/loading.gif" alt="Carregando..." />
+            <div class="skeleton skeleton--card" style="width: 150px; height: 150px; border-radius: 50%;"></div>
+            <span class="sr-only">Carregando, por favor aguarde...</span>
         </div>
     </div>
 
+    <!-- Conteúdo Principal -->
     <div class="container">
-        <main role="main">
+        <main id="main-content" role="main" tabindex="-1">
             @RenderBody()
         </main>
     </div>
 
+    <!-- Toast Container -->
+    <div class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

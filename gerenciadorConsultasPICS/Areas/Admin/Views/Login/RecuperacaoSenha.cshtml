@@ -3,21 +3,21 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container">
-
+<div class="list-container animate-fade-in">
     <h1>Recuperação de senha</h1>
+    <p class="text-muted mb-4">Informe seu e-mail para receber o código de recuperação</p>
 
-    <form id="formRecuperacaoSenha">
-        <div>
+    <form id="formRecuperacaoSenha" class="w-100" style="max-width: 400px;">
+        <div class="form-group">
             <label for="email" class="form-label">E-mail</label>
-            <input type="email" id="email" name="email" class="form-control" required />
+            <input type="email" id="email" name="email" class="form-control" required
+                   placeholder="seu@email.com" />
         </div>
 
-        <p>Um código será enviado para o e-mail cadastrado e deve ser informado na próxima etapa da recuperação de senha.</p>
+        <p class="text-muted mb-4">Um código será enviado para o e-mail cadastrado e deve ser informado na próxima etapa.</p>
 
-        <button type="submit" class="btn">Continuar</button>
+        <button type="submit" class="btn btn--lg w-100">Continuar</button>
     </form>
-
 </div>
 
 @section Scripts {

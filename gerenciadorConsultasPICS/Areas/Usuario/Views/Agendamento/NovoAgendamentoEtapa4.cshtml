@@ -7,11 +7,34 @@
 @section Styles {
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 }
-<div class="form-container">
+<div class="form-container container-centralizado animate-fade-in">
+    <!-- Indicador de Progresso -->
+    <nav class="stepper" aria-label="Progresso do agendamento">
+        <div class="stepper__step stepper__step--completed">
+            <span aria-hidden="true">✓</span>
+            <span class="sr-only">Etapa 1: Localização - concluída</span>
+        </div>
+        <div class="stepper__line stepper__line--active" aria-hidden="true"></div>
+        <div class="stepper__step stepper__step--completed">
+            <span aria-hidden="true">✓</span>
+            <span class="sr-only">Etapa 2: Instituição - concluída</span>
+        </div>
+        <div class="stepper__line stepper__line--active" aria-hidden="true"></div>
+        <div class="stepper__step stepper__step--completed">
+            <span aria-hidden="true">✓</span>
+            <span class="sr-only">Etapa 3: Data - concluída</span>
+        </div>
+        <div class="stepper__line stepper__line--active" aria-hidden="true"></div>
+        <div class="stepper__step stepper__step--active" aria-current="step">
+            <span aria-hidden="true">4</span>
+            <span class="sr-only">Etapa 4: Confirmação - atual</span>
+        </div>
+    </nav>
 
     <h1>Dados do paciente</h1>
+    <p class="text-muted mb-4">Preencha seus dados para finalizar o agendamento</p>
 
-    <form id="formEtapa4">
+    <form id="formEtapa4" class="w-100" style="max-width: 500px;">
         <div class="form-group">
             <label for="nomePaciente" class="form-label">Nome</label>
             <input id="nomePaciente" name="nomePaciente" class="form-control" required />
@@ -47,7 +70,14 @@
             <input id="grauAnsiedadePaciente" name="grauAnsiedadePaciente" required class="form-control" type="number" min="1" max="5" />
         </div>
 
-        <button type="submit" class="btn">Salvar</button>
+        <div class="btn-group mt-4">
+            <button type="submit" class="btn btn--lg">
+                Finalizar Agendamento
+                <svg class="icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </button>
+        </div>
     </form>
 
 </div>
