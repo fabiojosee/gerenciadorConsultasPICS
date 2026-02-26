@@ -1,0 +1,126 @@
+﻿@using AgendaPics.Domain.Enums
+@model IEnumerable<AgendaPics.Web.Areas.Usuario.ViewModels.Atendimento.MeusAtendimentosInstituicaoViewModel>
+@{
+    ViewData["Title"] = "Meus Atendimentos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="list-container">
+
+    <h1>Meus atendimentos</h1>
+
+    <div class="mt-4">
+
+        @if (!Model.Any())
+        {
+            <p>A instituição não possui atendimentos agendados.</p>
+        }
+
+        @foreach (var item in Model)
+        {
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>@item.nomePratica - @item.dataAtendimento.ToLongDateString()</span>
+                        <span class="fw-bold status-@item.status">@item.statusAtendimento</span>
+                    </div>
+                    <hr />
+                    <p class="mb-1" style="text-align: start;">@item.cidadePaciente, @item.estadoPaciente</p>
+                    <hr />
+                    <p class="mb-0" style="text-align: start;">Paciente: @(item.nomePaciente). Data de Nascimento: @(item.dataNascimentoPaciente.ToShortDateString()). Telefone: <span class="telefonePaciente">@item.telefonePaciente</span></p>
+
+                    @if (item.status == (byte)StatusAtendimento.Agendado)
+                    {
+                        <button type="button" class="btn-cancelar" onclick="cancelarAtendimento(@item.idAtendimento)">Cancelar atendimento</button>
+                        <button type="button" class="btn" onclick="finalizarAtendimento(@item.idAtendimento)">Finalizar atendimento</button>
+                    }
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        function aplicarMascaraTelefone() {
+            var els = document.getElementsByClassName("telefonePaciente");
+            Array.prototype.forEach.call(els, function (el) {
+                let telefone = el.textContent.replace(/\D/g, "");
+                telefone = telefone.replace(/^(\d{2})(\d)/g, "($1) $2");
+                telefone = telefone.replace(/(\d)(\d{4})$/, "$1-$2");
+                el.textContent = telefone;
+            });
+        }
+
+        function cancelarAtendimento(idAtendimento) {
+            Swal.fire({
+                title: "Caso cancele esse atendimento todos os outros atendimentos do mesmo agendamento serão cancelados, deseja prosseguir?",
+                showCancelButton: true,
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: 'LightSeaGreen',
+                confirmButtonText: 'Confirmar'
+            }).then((resultado) => {
+                if (resultado.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("CancelarAtendimentoInstituicao", "Atendimento", new { area = "Usuario" })',
+                        type: 'PUT',
+                        data: { idAtendimento: idAtendimento },
+                        success: function (resposta) {
+                            if (resposta.sucesso) {
+                                Swal.fire({
+                                    title: "Atendimentos cancelados com sucesso!",
+                                    confirmButtonColor: 'LightSeaGreen',
+                                    icon: "success"
+                                }).then((resultado) => { window.location.reload(true); });
+                            } else {
+                                exibirAlerta(resposta.mensagem);
+                            }
+                        },
+                        error: function () {
+                            exibirAlerta('Erro ao cancelar atendimento.');
+                        }
+                    });
+                }
+            });
+        }
+
+        function finalizarAtendimento(idAtendimento) {
+            Swal.fire({
+                title: "Deseja prosseguir com a ação?",
+                showCancelButton: true,
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: 'LightSeaGreen',
+                confirmButtonText: 'Confirmar'
+            }).then((resultado) => {
+                if (resultado.isConfirmed) {
+                    $.ajax({
+                        url: '@Url.Action("FinalizarAtendimento", "Atendimento", new { area = "Usuario" })',
+                        type: 'PUT',
+                        data: { idAtendimento: idAtendimento },
+                        success: function (resposta) {
+                            if (resposta.sucesso) {
+                                Swal.fire({
+                                    title: "Atendimento finalizado com sucesso!",
+                                    confirmButtonColor: 'LightSeaGreen',
+                                    icon: "success"
+                                }).then((resultado) => { window.location.reload(true); });
+                            } else {
+                                exibirAlerta(resposta.mensagem);
+                            }
+                        },
+                        error: function () {
+                            exibirAlerta('Erro ao finalizar atendimento.');
+                        }
+                    });
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            aplicarMascaraTelefone();
+        });
+
+    </script>
+}

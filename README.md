@@ -1,134 +1,131 @@
 # Agenda PICS
 
-O **Agenda PICS** é um aplicativo desenvolvido para gerenciar consultas vinculadas às Práticas Integrativas e Complementares em Saúde (PICS). Este sistema facilita o agendamento, acompanhamento e administração dos atendimentos, visando organizar fluxos, otimizar a gestão e garantir a qualidade dos serviços ofertados.
+O **Agenda PICS** é um sistema web para gerenciamento de consultas vinculadas às Práticas Integrativas e Complementares em Saúde (PICS). Facilita o agendamento, acompanhamento e administração dos atendimentos, organizando fluxos e otimizando a gestão dos serviços ofertados.
 
 ## Sumário
 
-- [Visão Geral](#visão-geral)
-- [Funcionalidades Principais](#funcionalidades-principais)
-- [Arquitetura do Projeto](#arquitetura-do-projeto)
-- [Tecnologias Utilizadas](#tecnologias-utilizadas)
-- [Instalação e Execução](#instalação-e-execução)
-- [Configuração do Banco de Dados](#configuração-do-banco-de-dados)
-- [Executando com Docker Compose](#executando-com-docker-compose)
+- [Funcionalidades](#funcionalidades)
+- [Arquitetura](#arquitetura)
+- [Tecnologias](#tecnologias)
+- [Como Executar](#como-executar)
+  - [Com Docker Compose (recomendado)](#com-docker-compose-recomendado)
+  - [Localmente](#localmente)
 - [Estrutura de Pastas](#estrutura-de-pastas)
 - [Contribuindo](#contribuindo)
 
 ---
 
-## Visão Geral
+## Funcionalidades
 
-O sistema Agenda PICS foi desenvolvido para facilitar a gestão das práticas integrativas em ambientes de saúde, permitindo um controle eficiente de pacientes e agendamentos. O aplicativo oferece uma interface intuitiva e mecanismos de controle de acesso que auxiliam a administração e a tomada de decisões.
+- Cadastro e gerenciamento de instituições e práticas
+- Agendamento e cancelamento de consultas
+- Controle de acesso por perfil (administrador e instituição)
+- Notificações por e-mail via API Mailjet
+- Interface responsiva
 
-## Funcionalidades Principais
+## Arquitetura
 
-- **Cadastro de Instituições**: Adição, edição e exclusão de instituições.
-- **Cadastro de Práticas**: Adição, edição e exclusão de práticas.
-- **Agendamento de Consultas**: Agendamento e cancelamento de consultas.
-- **Controle de Usuários**: Gerenciamento de acesso e permissões.
-- **Interface Responsiva**: Utilização facilitada em diferentes dispositivos.
-- **Notificação por e-mail**: Envio automático de e-mails para notificar novos agendamentos.
+O projeto segue uma arquitetura limpa em 4 camadas:
 
-## Arquitetura do Projeto
+```
+AgendaPics.Domain         — Entidades, enums, interfaces de domínio, padrão Result<T>
+AgendaPics.Application    — Features CQRS, mediator customizado, FluentValidation
+AgendaPics.Infrastructure — EF Core, repositórios, segurança (BCrypt), serviços
+AgendaPics.Web            — ASP.NET Core MVC, Areas (Admin/Usuario), controllers, views
+```
 
-O projeto é uma aplicação web desenvolvida com o padrão MVC (Model-View-Controller), utilizando C# (.NET Core) no backend e HTML, CSS e JavaScript no frontend.
+O padrão CQRS é utilizado via mediator customizado. Cada caso de uso possui um `Command` ou `Query` com seu respectivo `Handler`, e retorna `Result<T>` — sem exceções para falhas de negócio.
 
-### Camadas Principais
+## Tecnologias
 
-- **Model**: Representa as entidades do sistema (Agendamento, Pratica, Instituicao, etc.).
-- **View**: Telas e páginas HTML/CSS utilizadas pelos usuários.
-- **Controller**: Lógica de negócio, manipulação dos dados e regras do sistema.
+- **Backend**: C# / .NET 8 / ASP.NET Core MVC
+- **Banco de Dados**: SQL Server 2022 (EF Core 8 — code-first com migrations)
+- **Segurança**: BCrypt, cookie auth, rate limiting, CSRF
+- **E-mail**: Mailjet API
+- **Infraestrutura**: Docker, Docker Compose
 
-## Tecnologias Utilizadas
+## Como Executar
 
-- **Backend**: C# (.NET Core)
-- **Frontend**: HTML, CSS, JavaScript, C#
-- **Banco de Dados**: SQL Server
-- **Outros**: jQuery, Docker, Docker Compose
+### Com Docker Compose (recomendado)
 
-## Instalação e Execução
+Pré-requisitos: [Docker Desktop](https://www.docker.com/products/docker-desktop)
 
-1. **Clone o repositório**:
-   ```bash
-   git clone https://github.com/fabiojosee/gerenciadorConsultasPICS.git
-   ```
+```bash
+git clone https://github.com/fabiojosee/agenda-pics.git
+cd agenda-pics
+docker compose up -d --build
+```
 
-2. **Abra o projeto no Visual Studio (ou editor compatível)**
+O banco de dados é criado e populado **automaticamente** na primeira inicialização via EF Core migrations. O processo aguarda o SQL Server ficar disponível (pode levar até 90 segundos na primeira vez).
 
-3. **Configure o banco de dados** (veja instruções detalhadas abaixo).
+Acesse: **http://localhost:32033**
 
-4. **Edite a string de conexão** no arquivo de configuração (`appsettings.Development.json` ou `appsettings.Production.json`) para refletir as informações do seu servidor e banco de dados.
+Login padrão: `admin` / `123`
 
-5. **Execute a aplicação**:
-   - No Visual Studio, pressione F5 ou execute o comando:
-     ```bash
-     dotnet run
-     ```
-   - Acesse `http://localhost:xxxx` no navegador.
+> Se o container da aplicação reiniciar antes do SQL Server estar pronto, execute:
+> ```bash
+> docker compose restart agendapics
+> ```
+> Acompanhe os logs com `docker logs agendapicsweb -f`
 
-## Configuração do Banco de Dados
+---
 
-> **Atenção:** O projeto ainda não utiliza migrations automáticas. Portanto, você deve criar o banco de dados e suas tabelas manualmente, antes de rodar a aplicação.
+### Localmente
 
-### 1. Crie o Banco de Dados e as Tabelas
+Pré-requisitos: [.NET 8 SDK](https://dotnet.microsoft.com/download) e uma instância SQL Server acessível.
 
-No seu SGBD (por exemplo, SQL Server Management Studio), execute o script localizado em "\Data\Scripts\create_database.sql" para criar o banco de dados e as tabelas do sistema.
+**1. Clone o repositório**
 
-### 2. Adicione os Registros Inicias
+```bash
+git clone https://github.com/fabiojosee/agenda-pics.git
+cd agenda-pics
+```
 
-Execute o script localizado em "\Data\Scripts\init_insert.sql" para inserir registros iniciais nas tabelas do sistema, como os estados brasileiros e algumas de suas cidades (esses dados podem ser ajustados conforme necessário). O script também cria um usuário administrador padrão com login "admin" e senha "123".
+**2. Configure a string de conexão**
 
-> **Importante:** Altere a senha padrão após os testes iniciais. A senha é armazenada criptografada utilizando o algoritmo SHA-256 para garantir segurança.
-
-### 3. Configure a String de Conexão
-
-No arquivo `appsettings.Development.json` ou `appsettings.Production.json`, configure a string de conexão para apontar ao banco recém-criado. Exemplo para SQL Server:
+Edite `src/AgendaPics.Web/appsettings.Development.json`:
 
 ```json
 "ConnectionStrings": {
-  "DefaultConnection": "Server=SEU_SERVIDOR;Database=dbAgendaPics;User Id=SEU_USUARIO;Password=SUA_SENHA;TrustServerCertificate=True;
+  "DefaultConnection": "Server=localhost;Database=dbAgendaPics;User Id=SEU_USUARIO;Password=SUA_SENHA;TrustServerCertificate=True;"
 }
 ```
 
-## Executando com Docker Compose
+**3. Execute**
 
-Se preferir, você pode executar o projeto utilizando **Docker Compose**. Isso facilita a configuração do ambiente, subindo automaticamente a aplicação e o banco de dados.
+```bash
+cd src/AgendaPics.Web && dotnet run
+```
 
-1. Certifique-se de ter o [Docker](https://www.docker.com/) e o [Docker Compose](https://docs.docker.com/compose/) instalados em sua máquina.
+O banco será criado e populado automaticamente ao subir a aplicação.
 
-2. Na raiz do projeto, execute o comando abaixo para subir todos os serviços necessários:
-   ```bash
-   docker compose up -d
-   ```
+Acesse: **https://localhost:5001** (ou a porta exibida no terminal)
 
-3. O sistema estará disponível em `http://localhost:xxxx` (ajuste a porta conforme configuração do seu `docker-compose.yml`).
+Login padrão: `admin` / `123`
 
-> **Observação:**  
-> Caso esteja usando Docker Compose para o banco de dados, lembre-se de que, na primeira execução, será necessário acessar o container do banco e criar manualmente as tabelas e usuários iniciais, conforme orientações acima.
+> Altere a senha padrão após o primeiro acesso.
 
 ## Estrutura de Pastas
 
 ```
-/Areas            # Divide as áreas principais do sistema: usuário e administrador
-/Controllers      # Lógica de negócio e roteamento
-/Models           # Definição das entidades
-/Views            # Páginas HTML
-/wwwroot          # Arquivos estáticos (CSS, JS, imagens)
-/Data             # Contexto de banco de dados
-/Repositories     # Acesso e manipulação de dados
-/Services         # Serviços utilizados para gestão (e-mail, segurança)
+src/
+├── AgendaPics.Domain/          # Entidades, enums, interfaces, Result<T>
+├── AgendaPics.Application/     # CQRS: features, commands, queries, handlers
+├── AgendaPics.Infrastructure/  # EF Core, repositórios, segurança, serviços, migrations
+
+└── AgendaPics.Web/             # MVC: controllers, views, areas, program.cs
+    ├── Areas/Admin/            # Login, instituições, práticas
+    └── Areas/Usuario/          # Agendamentos e atendimentos
 ```
 
 ## Contribuindo
 
-Contribuições são bem-vindas! Siga os passos abaixo:
-
-1. Faça um fork do projeto.
+1. Faça um fork do projeto
 2. Crie uma branch para sua feature (`git checkout -b minha-feature`)
-3. Commit suas alterações (`git commit -m 'Adiciona nova feature'`)
-4. Faça push para o branch (`git push origin minha-feature`)
-5. Abra um Pull Request.
+3. Commit suas alterações (`git commit -m 'feat: descrição da mudança'`)
+4. Push para a branch (`git push origin minha-feature`)
+5. Abra um Pull Request
 
 ---
 
-> Para dúvidas, sugestões ou problemas, abra uma [issue](https://github.com/fabiojosee/gerenciadorConsultasPICS/issues).
+> Para dúvidas ou problemas, abra uma [issue](https://github.com/fabiojosee/agenda-pics/issues).
