@@ -1,0 +1,185 @@
+@using AgendaPics.Domain.Enums
+@model IEnumerable<AgendaPics.Web.Areas.Usuario.ViewModels.Atendimento.MeusAtendimentosViewModel>
+@{
+    ViewData["Title"] = "Meus Atendimentos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="list-container animate-fade-in">
+    <h1>Meus Atendimentos</h1>
+    <p class="text-muted mb-4">Acompanhe seus agendamentos e atendimentos</p>
+
+    <div class="mt-4">
+        @if (!Model.Any())
+        {
+            <div class="empty-state">
+                <svg class="empty-state__icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <h2 class="empty-state__title">Nenhum atendimento encontrado</h2>
+                <p class="empty-state__text">Você ainda não possui nenhum atendimento agendado.</p>
+                <a href="/Usuario/Agendamento/NovoAgendamentoEtapa1" class="btn">
+                    <svg class="icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Fazer Novo Agendamento
+                </a>
+            </div>
+        }
+        else
+        {
+            @foreach (var item in Model)
+            {
+                <article class="card" role="article" aria-label="Atendimento de @item.nomePratica">
+                    <div class="card__header d-flex justify-between align-center flex-wrap gap-2">
+                        <h3 class="card__title mb-0">@item.nomePratica</h3>
+                        @{
+                            var badgeClass = item.status switch
+                            {
+                                (byte)StatusAtendimento.Agendado => "badge--info",
+                                (byte)StatusAtendimento.Finalizado => "badge--success",
+                                (byte)StatusAtendimento.Cancelado => "badge--danger",
+                                _ => "badge--info"
+                            };
+                        }
+                        <span class="badge @badgeClass">@item.statusAtendimento</span>
+                    </div>
+                    <div class="card-body">
+                        <!-- Data -->
+                        <div class="d-flex align-center gap-2 mb-3">
+                            <svg class="icon icon--sm text-primary" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            <span class="fw-bold">@item.dataAtendimento.ToString("dddd, dd 'de' MMMM 'de' yyyy")</span>
+                        </div>
+
+                        <!-- Horário -->
+                        <div class="d-flex align-center gap-2 mb-3">
+                            <svg class="icon icon--sm text-muted" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            <span>
+                                @(item.horarioInicioAtendimento.ToString(@"hh\:mm")) às
+                                @(item.horarioFimAtendimento.ToString(@"hh\:mm"))
+                                <span class="text-muted">(por ordem de chegada)</span>
+                            </span>
+                        </div>
+
+                        <!-- Instituição -->
+                        <div class="d-flex align-center gap-2 mb-3">
+                            <svg class="icon icon--sm text-muted" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                            <span>@item.nomeInstituicao</span>
+                        </div>
+
+                        <!-- Localização -->
+                        <div class="d-flex align-center gap-2 mb-3">
+                            <svg class="icon icon--sm text-muted" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            <span>@item.cidadePaciente, @item.estadoPaciente - CEP: @item.cepInstituicao</span>
+                        </div>
+
+                        <!-- Ações -->
+                        @if (item.status == (byte)StatusAtendimento.Agendado || item.status == (byte)StatusAtendimento.Finalizado)
+                        {
+                            <div class="card__actions">
+                                @if (item.status == (byte)StatusAtendimento.Agendado)
+                                {
+                                    <button type="button"
+                                            class="btn-cancelar"
+                                            onclick="cancelarAtendimento(@item.idAtendimento)"
+                                            aria-label="Cancelar atendimento de @item.nomePratica">
+                                        <svg class="icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                                        </svg>
+                                        Cancelar
+                                    </button>
+                                }
+                                @if (item.status == (byte)StatusAtendimento.Finalizado)
+                                {
+                                    <button type="button"
+                                            class="btn"
+                                            onclick="avaliarAtendimento(@item.idAtendimento)"
+                                            aria-label="Avaliar atendimento de @item.nomePratica">
+                                        <svg class="icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                        </svg>
+                                        Avaliar
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </div>
+                </article>
+            }
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        function cancelarAtendimento(idAtendimento) {
+            exibirConfirmacao(
+                'Cancelar Atendimento',
+                'Caso cancele esse atendimento, todos os outros atendimentos do mesmo agendamento serão cancelados. Deseja prosseguir?',
+                function() {
+                    $.ajax({
+                        url: '@Url.Action("CancelarAtendimento", "Atendimento", new { area = "Usuario" })',
+                        type: 'PUT',
+                        data: { idAtendimento: idAtendimento },
+                        success: function (resposta) {
+                            if (resposta.sucesso) {
+                                exibirSucesso('Atendimentos cancelados com sucesso!');
+                                setTimeout(function() {
+                                    window.location.reload(true);
+                                }, 1500);
+                            } else {
+                                exibirAlerta(resposta.mensagem);
+                            }
+                        },
+                        error: function () {
+                            exibirAlerta('Erro ao cancelar atendimento.');
+                        }
+                    });
+                }
+            );
+        }
+
+        function avaliarAtendimento(idAtendimento) {
+            $.ajax({
+                url: '@Url.Action("AvaliarAtendimento", "Atendimento", new { area = "Usuario" })',
+                type: 'POST',
+                data: { idAtendimento: idAtendimento, link: '@ViewBag.FormularioAvaliacao' },
+                success: function (resposta) {
+                    if (resposta.sucesso) {
+                        exibirToast('Abrindo formulário de avaliação...', 'success');
+                        window.open('@ViewBag.FormularioAvaliacao', '_blank');
+                    } else {
+                        exibirAlerta(resposta.mensagem);
+                    }
+                },
+                error: function () {
+                    exibirAlerta('Erro ao acessar avaliação.');
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            configurarBotaoVoltar('/');
+        });
+    </script>
+}

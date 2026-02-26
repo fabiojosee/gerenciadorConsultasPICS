@@ -1,0 +1,96 @@
+@{
+    ViewData["Title"] = "Solicitar Acesso aos Atendimentos";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card__header">
+                    <h4 class="card__title">Solicitar Acesso aos Meus Atendimentos</h4>
+                </div>
+                <div class="card-body">
+                    @if (TempData["Erro"] != null)
+                    {
+                        <div class="alert alert-danger">
+                            @TempData["Erro"]
+                        </div>
+                    }
+                    <p class="text-muted">
+                        Para acessar seus atendimentos, informe seu CPF e e-mail cadastrado.
+                        Você receberá um código de acesso no e-mail informado.
+                    </p>
+                    <form id="formSolicitarAcesso">
+                        <div class="mb-3">
+                            <label for="cpf" class="form-label">CPF</label>
+                            <input type="text" class="form-control" id="cpf" name="cpf" required
+                                   placeholder="000.000.000-00" maxlength="14" value="@ViewBag.Cpf">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">E-mail</label>
+                            <input type="email" class="form-control" id="email" name="email" required
+                                   placeholder="seu@email.com">
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary" id="btnSolicitar">
+                                Solicitar Código de Acesso
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function AplicarMascaraCPF(element) {
+            let value = $(element).val().replace(/\D/g, '');
+            if (value.length > 11) value = value.substring(0, 11);
+
+            if (value.length > 9) {
+                value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+            } else if (value.length > 6) {
+                value = value.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+            } else if (value.length > 3) {
+                value = value.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+            }
+            $(element).val(value);
+        }
+
+        $(document).ready(function() {
+            $('#cpf').on('input', function() {
+                AplicarMascaraCPF(this);
+            });
+            AplicarMascaraCPF('#cpf');
+            configurarBotaoVoltar('/');
+
+            $('#formSolicitarAcesso').on('submit', function(e) {
+                e.preventDefault();
+
+                var btn = $('#btnSolicitar');
+                btn.prop('disabled', true).text('Enviando...');
+
+                $.ajax({
+                    url: '@Url.Action("SolicitarAcesso", "Atendimento", new { area = "Usuario" })',
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        if (response.sucesso) {
+                            window.location.href = '@Url.Action("ValidarToken", "Atendimento", new { area = "Usuario" })';
+                        } else {
+                            alert(response.mensagem);
+                            btn.prop('disabled', false).text('Solicitar Código de Acesso');
+                        }
+                    },
+                    error: function() {
+                        alert('Erro ao processar solicitação. Tente novamente.');
+                        btn.prop('disabled', false).text('Solicitar Código de Acesso');
+                    }
+                });
+            });
+        });
+    </script>
+}

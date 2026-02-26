@@ -7,7 +7,7 @@
     <ProjectGuid>eba700bf-ad7e-4e1d-94c8-7d25c053d75e</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}</DockerServiceUrl>
-    <DockerServiceName>gerenciadorconsultaspics</DockerServiceName>
+    <DockerServiceName>agendapics</DockerServiceName>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.yml" />

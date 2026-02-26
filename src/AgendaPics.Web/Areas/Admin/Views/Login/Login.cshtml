@@ -1,0 +1,103 @@
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="form-container container-centralizado animate-fade-in">
+    <h1>Área Administrativa</h1>
+    <p class="text-muted mb-4">Faça login para acessar o sistema</p>
+
+    <form id="formLogin" class="w-100" style="max-width: 400px;">
+        <div class="form-group">
+            <label for="login" class="form-label">Login</label>
+            <div class="input-icon-wrapper">
+                <input type="text"
+                       id="login"
+                       name="login"
+                       class="form-control"
+                       placeholder="Digite seu login"
+                       autocomplete="username"
+                       required
+                       aria-required="true" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="senha" class="form-label">Senha</label>
+            <div class="input-icon-wrapper">
+                <input type="password"
+                       id="senha"
+                       name="senha"
+                       class="form-control"
+                       placeholder="Digite sua senha"
+                       autocomplete="current-password"
+                       required
+                       aria-required="true" />
+            </div>
+        </div>
+
+        <div class="btn-group mt-4">
+            <button type="submit" class="btn btn--lg">
+                <svg class="icon" aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                    <polyline points="10 17 15 12 10 7"></polyline>
+                    <line x1="15" y1="12" x2="3" y2="12"></line>
+                </svg>
+                Entrar
+            </button>
+        </div>
+    </form>
+
+    <div class="mt-4 d-flex flex-column gap-2" style="max-width: 400px;">
+        <a href="/Admin/Login/RecuperacaoSenha" class="text-primary">
+            Esqueci minha senha
+        </a>
+        <a href="@ViewBag.FormularioNovaInstituicao" target="_blank" rel="noopener noreferrer" class="text-muted">
+            Solicitar cadastro de instituição
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            configurarBotaoVoltar('/');
+
+            // Focus no primeiro campo
+            $('#login').focus();
+
+            $('#formLogin').submit(function (e) {
+                e.preventDefault();
+
+                var formData = $(this).serialize();
+                var $btn = $(this).find('button[type="submit"]');
+                $btn.prop('disabled', true);
+
+                $.ajax({
+                    url: '@Url.Action("Login", "Login")',
+                    type: 'POST',
+                    data: formData,
+                    success: function (resposta) {
+                        if (resposta.sucesso) {
+                            exibirToast('Login realizado com sucesso!', 'success');
+                            setTimeout(function() {
+                                if (resposta.idPerfil == '@((byte)AgendaPics.Domain.Enums.Perfil.Admin)') {
+                                    window.location.href = '@Url.Action("AreaAdministrativa", "Login")';
+                                } else {
+                                    window.location.href = '@Url.Action("AreaAdministrativaInstituicao", "Login")';
+                                }
+                            }, 1000);
+                        } else {
+                            exibirAlerta(resposta.mensagem);
+                            $btn.prop('disabled', false);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        exibirAlerta('Erro ao realizar login. Tente novamente.');
+                        $btn.prop('disabled', false);
+                    }
+                });
+            });
+        });
+    </script>
+}

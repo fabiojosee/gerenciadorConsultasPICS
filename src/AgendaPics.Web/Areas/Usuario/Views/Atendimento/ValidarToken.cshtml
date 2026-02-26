@@ -1,0 +1,50 @@
+@{
+    ViewData["Title"] = "Validar Token de Acesso";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var cpf = ViewBag.Cpf as string ?? "";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card__header">
+                    <h4 class="mb-0 card__title">Validar Código de Acesso</h4>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        Um código de acesso foi enviado para o seu e-mail.
+                        Insira o código abaixo para acessar seus atendimentos.
+                    </p>
+                    <p class="text-muted small">
+                        O código é válido por 30 minutos.
+                    </p>
+                    <form id="formValidarToken" method="get" action="@Url.Action("MeusAtendimentos", "Atendimento", new { area = "Usuario" })">
+                        <input type="hidden" name="cpf" value="@cpf" />
+                        <div class="mb-3">
+                            <label for="token" class="form-label">Código de Acesso</label>
+                            <input type="text" class="form-control" id="token" name="token" required
+                                   placeholder="Insira o código recebido por e-mail">
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                Acessar Meus Atendimentos
+                            </button>
+                            <a href="@Url.Action("SolicitarAcesso", "Atendimento", new { area = "Usuario" })" class="btn btn-outline-secondary">
+                                Solicitar Novo Código
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            configurarBotaoVoltar('@Url.Action("SolicitarAcesso", "Atendimento")');
+        });
+    </script>
+}
