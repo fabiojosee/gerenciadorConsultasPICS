@@ -15,7 +15,14 @@ dotnet build agenda-pics.sln
 docker compose up -d --build
 ```
 
-Não existem projetos de teste na solução atualmente.
+### Testes
+
+```bash
+# Executar testes unitários
+dotnet test tests/AgendaPics.Application.Tests/AgendaPics.Application.Tests.csproj --configuration Release --verbosity normal
+```
+
+O projeto de testes fica em `tests/AgendaPics.Application.Tests/` (xUnit + Moq + FluentAssertions). São 120 testes unitários cobrindo os 26 handlers da camada Application — sem dependências externas (banco, e-mail, etc.).
 
 ## Banco de Dados
 
@@ -97,3 +104,4 @@ Roteamento baseado em Areas:
 | `src/AgendaPics.Infrastructure/DependencyInjection.cs` | Registros de IoC para as camadas de infra e aplicação |
 | `src/AgendaPics.Application/Common/Mediator/` | Implementação do mediator CQRS customizado |
 | `docker-compose.yml` | Orquestração dos containers (app + SQL Server 2022 Express) |
+| `.github/workflows/tests.yml` | GitHub Actions: executa os testes unitários em PRs para `master` |
