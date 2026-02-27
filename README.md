@@ -10,6 +10,7 @@ O **Agenda PICS** é um sistema web para gerenciamento de consultas vinculadas �
 - [Como Executar](#como-executar)
   - [Com Docker Compose (recomendado)](#com-docker-compose-recomendado)
   - [Localmente](#localmente)
+- [Testes](#testes)
 - [Estrutura de Pastas](#estrutura-de-pastas)
 - [Contribuindo](#contribuindo)
 
@@ -43,6 +44,8 @@ O padrão CQRS é utilizado via mediator customizado. Cada caso de uso possui um
 - **Segurança**: BCrypt, cookie auth, rate limiting, CSRF
 - **E-mail**: Mailjet API
 - **Infraestrutura**: Docker, Docker Compose
+- **Testes**: xUnit, Moq, FluentAssertions
+- **CI**: GitHub Actions
 
 ## Como Executar
 
@@ -105,6 +108,16 @@ Login padrão: `admin` / `123`
 
 > Altere a senha padrão após o primeiro acesso.
 
+## Testes
+
+O projeto possui uma suíte de testes unitários cobrindo os 26 handlers da camada Application (120 testes). Os testes são completamente isolados — sem dependências de banco de dados ou serviços externos.
+
+```bash
+dotnet test tests/AgendaPics.Application.Tests/AgendaPics.Application.Tests.csproj --configuration Release --verbosity normal
+```
+
+Os testes são executados automaticamente pelo GitHub Actions em todo Pull Request direcionado à branch `master`.
+
 ## Estrutura de Pastas
 
 ```
@@ -112,10 +125,11 @@ src/
 ├── AgendaPics.Domain/          # Entidades, enums, interfaces, Result<T>
 ├── AgendaPics.Application/     # CQRS: features, commands, queries, handlers
 ├── AgendaPics.Infrastructure/  # EF Core, repositórios, segurança, serviços, migrations
-
 └── AgendaPics.Web/             # MVC: controllers, views, areas, program.cs
     ├── Areas/Admin/            # Login, instituições, práticas
     └── Areas/Usuario/          # Agendamentos e atendimentos
+tests/
+└── AgendaPics.Application.Tests/  # Testes unitários (xUnit + Moq + FluentAssertions)
 ```
 
 ## Contribuindo
